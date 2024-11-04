@@ -1,0 +1,27 @@
+---
+// components
+import FooterLink from "@components/Footer/FooterLink.astro";
+import Button from "@components/Button/Button.astro";
+import SocialCloud from "@components/SocialCloud/SocialCloud.astro";
+
+// data
+import siteData from "@config/siteData.json";
+
+const today = new Date();
+---
+
+<footer class="container mb-12 mt-20">
+  <hr class="border-t-2 border-t-base-600" />
+  <div
+    class="mt-4 flex w-full flex-wrap items-center justify-between gap-x-8 gap-y-2"
+  >
+    <div class="flex items-center">
+      <SocialCloud />
+    </div>
+
+    <div class="description text-sm">
+      &copy; {today.getFullYear()}
+      {" "}{siteData.name}. All rights reserved.
+    </div>
+  </div>
+</footer>

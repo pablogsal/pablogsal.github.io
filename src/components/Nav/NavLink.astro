@@ -1,0 +1,37 @@
+---
+// data
+import { type navLinkItem } from "@config/navData.json";
+
+interface Props {
+  navItem: navLinkItem;
+  class?: string;
+}
+
+const { navItem, class: className } = Astro.props as Props;
+const { text, href, newTab = false } = navItem;
+
+// if the current page is the same as the link, we add a gradient underline
+---
+
+<li>
+  <a
+    class:list={[
+      `primary-focus group/navlink relative block w-full px-4 py-2 font-medium ${className}`,
+    ]}
+    href={href}
+    target={newTab ? "_blank" : ""}
+    rel={newTab ? "noopener noreferrer" : ""}
+  >
+    <span
+      class={Astro.url.pathname === href
+        ? "bg-gradient-to-r from-primary-600 to-primary-600 bg-left-bottom bg-no-repeat bg-[length:100%_2px]"
+        : "navlink__underline-ltr"}>{text}</span
+    >
+  </a>
+</li>
+
+<style lang="scss">
+  .navlink__underline-ltr {
+    @apply bg-gradient-to-r from-primary-600 to-primary-600 bg-[length:0%_2px] bg-left-bottom bg-no-repeat transition-[background-size] duration-300 group-hover/navlink:bg-[length:100%_2px];
+  }
+</style>

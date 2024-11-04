@@ -1,0 +1,55 @@
+---
+/**
+ * * Hero with socials and profile image on the side
+ */
+import { Icon } from "astro-icon/components";
+import { Image } from "astro:assets";
+
+// components
+import Button from "@components/Button/Button.astro";
+import SocialCloud from "@components/SocialCloud/SocialCloud.astro";
+
+// data
+import siteData from "@config/siteData.json";
+
+import heroImage from "@assets/images/pablogsal.jpeg";
+---
+
+<section id="hero" class="relative flex w-full pb-6">
+  <!-- hero items -->
+  <div
+    class="container grid items-center gap-10 pt-36 md:grid-cols-3 md:gap-20 md:pt-44"
+  >
+    <!-- Hero text -->
+    <div class="mx-auto max-w-lg md:col-span-2 md:ml-0 md:max-w-full">
+      <h1 class="h1" data-aos="fade-up">
+        Hi, I'm {siteData.author.name}
+      </h1>
+      <p class="description mt-6 text-pretty" data-aos="fade-up">
+        I program the programming program that other programmers use to program
+        programs. Python Steering Council and core developer. Python 3.10/3.11
+        release manager. Deals with black holes and parsers. Attracts linker
+        problems.
+      </p>
+      <div class="mt-6 flex gap-4" data-aos="fade-up" data-aos-delay="1.2">
+        <SocialCloud />
+      </div>
+    </div>
+
+    <!-- hero image -->
+    <div class="mx-auto max-w-sm md:col-span-1 md:max-w-full">
+      <div class="aspect-square overflow-hidden">
+        <Image
+          src={heroImage}
+          class="w-full object-cover"
+          alt="web reaper profile"
+          loading="eager"
+          width={600}
+          densities={[1.5, 2]}
+          data-aos="fade-in"
+          data-aos-delay=".6"
+        />
+      </div>
+    </div>
+  </div>
+</section>

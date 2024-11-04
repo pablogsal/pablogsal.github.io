@@ -1,0 +1,28 @@
+---
+// layout
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+// components
+import TalksVerticalCards from "@components/Talks/TalkVerticalCards.astro";
+---
+
+<BaseLayout
+  title={`Talks I have delivered`}
+  description="Discover some of the projects I created or I currently maintain"
+>
+  <section id="projects-hero" class="container pt-36 md:pt-44">
+    <div
+      class="mx-auto grid w-full max-w-lg items-start gap-10 md:max-w-full md:grid-cols-5"
+    >
+      <div class="md:col-span-3">
+        <h1 class="h2">
+          My <span class="text-primary-600">talks</span>
+        </h1>
+        <p class="description mt-6">
+          Talks I have delivered at various conferences.
+        </p>
+      </div>
+    </div>
+  </section>
+  <TalksVerticalCards />
+</BaseLayout>
