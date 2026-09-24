@@ -1,0 +1,55 @@
+---
+/**
+ * Chapter heading shared by every section: rubric numeral, blackletter
+ * title, optional italic lede, and a margin note.
+ */
+interface Props {
+  num: string; // Roman numeral, e.g. "III"
+  title: string;
+  kicker?: string; // mono margin note, e.g. "import cpython"
+  lede?: string;
+}
+const { num, title, kicker, lede } = Astro.props;
+---
+
+<header class="head reveal">
+  <div class="meta">
+    <span class="num mono">§ {num}</span>
+    {kicker && <span class="label">{kicker}</span>}
+  </div>
+  <h2 class="display title">{title}</h2>
+  {lede && <p class="lede">{lede}</p>}
+  <slot />
+</header>
+
+<style>
+  .head {
+    display: grid;
+    gap: var(--space-4);
+    margin-bottom: var(--space-7);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--line);
+  }
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
+  }
+  .num {
+    color: var(--ember);
+    font-size: var(--step--1);
+    letter-spacing: 0.1em;
+  }
+  .title {
+    font-size: var(--step-4);
+    line-height: 0.95;
+  }
+  .lede {
+    max-width: 38rem;
+    font-size: var(--step-1);
+    font-style: italic;
+    color: var(--ash);
+    line-height: 1.4;
+  }
+</style>

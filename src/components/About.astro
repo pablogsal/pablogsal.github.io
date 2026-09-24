@@ -1,0 +1,174 @@
+---
+import { Image } from "astro:assets";
+import portrait from "../assets/pablo.jpeg";
+import SectionHead from "./SectionHead.astro";
+import { traceback, finalError, bio, facts } from "../data/about";
+---
+
+<section id="about" class="wrap about">
+  <SectionHead num="I" title="The traceback" kicker="most recent call last" />
+
+  <div class="grid">
+    <figure class="plate reveal">
+      <div class="plate__frame">
+        <Image
+          src={portrait}
+          alt="Black and white portrait of Pablo wearing an ornate dark mask with horns and hanging chains"
+          width={460}
+          height={460}
+          loading="lazy"
+        />
+      </div>
+      <figcaption class="label">
+        <span>Fig. 1</span>
+        <span>The author, dressed for a release day</span>
+      </figcaption>
+    </figure>
+
+    <div class="text">
+      <pre class="tb reveal" aria-label="A Python traceback that tells Pablo's life story"><code><span class="tb__head">Traceback (most recent call last):</span>
+{traceback.map((f) => (
+  <span class="tb__frame">  File <span class="tb__file">"{f.file}"</span>, line <span class="tb__line">{f.line}</span>, in <span class="tb__fn">{f.fn}</span>
+    {f.pre}<span class="tb__hl">{f.hl}</span>{f.post}
+    {" ".repeat(f.pre.length)}<span class="ember">{"^".repeat(f.hl.length)}</span>
+</span>
+))}<span class="tb__err"><span class="ember">{finalError.type}</span>: {finalError.msg}</span>
+<span class="tb__hint">Did you mean: <span class="ember">'{finalError.hint}'</span>?</span></code></pre>
+
+      <div class="bio reveal">
+        {bio.map((p) => <p set:html={p} />)}
+      </div>
+
+      <dl class="facts reveal">
+        {
+          facts.map((f) => (
+            <div>
+              <dt class="label">{f.k}</dt>
+              <dd>{f.v}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    padding-top: var(--space-8);
+  }
+  .grid {
+    display: grid;
+    gap: var(--space-6);
+  }
+  @media (min-width: 60rem) {
+    .grid {
+      grid-template-columns: minmax(16rem, 5fr) 8fr;
+      gap: var(--space-7);
+      align-items: start;
+    }
+    .plate {
+      position: sticky;
+      top: 6rem;
+    }
+  }
+
+  .plate {
+    margin: 0;
+    max-width: 26rem;
+  }
+  .plate__frame {
+    padding: 0.6rem;
+    border: 1px solid var(--line-2);
+    outline: 1px solid var(--line);
+    outline-offset: 5px;
+  }
+  .plate__frame :global(img) {
+    width: 100%;
+    height: auto;
+    filter: grayscale(1) contrast(1.08);
+  }
+  .plate figcaption {
+    display: flex;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+  }
+  .plate figcaption span:first-child {
+    color: var(--ember);
+    white-space: nowrap;
+  }
+
+  .text {
+    display: grid;
+    gap: var(--space-6);
+    min-width: 0;
+  }
+
+  .tb {
+    margin: 0;
+    padding: var(--space-5);
+    overflow-x: auto;
+    background: var(--ink-2);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--ember-dim);
+    font-size: clamp(0.7rem, 0.62rem + 0.35vw, 0.86rem);
+    line-height: 1.6;
+    color: var(--ash);
+  }
+  .tb code {
+    font-size: inherit;
+  }
+  .tb__head {
+    color: var(--bone);
+  }
+  .tb__file {
+    color: var(--bone);
+  }
+  .tb__fn {
+    color: var(--gold);
+  }
+  .tb__hl {
+    color: var(--bone);
+  }
+  .tb__err {
+    color: var(--bone);
+  }
+  .tb__hint {
+    color: var(--dust);
+  }
+
+  .bio {
+    display: grid;
+    gap: var(--space-4);
+    max-width: 40rem;
+    font-size: var(--step-1);
+    line-height: 1.5;
+  }
+  .bio :global(p:first-child::first-letter) {
+    float: left;
+    margin: 0.08em 0.12em 0 0;
+    font-family: var(--f-display);
+    font-size: 3.6em;
+    line-height: 0.8;
+    color: var(--ember);
+  }
+  .bio :global(em) {
+    color: var(--ash);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0;
+    margin: 0;
+    border-top: 1px solid var(--line);
+  }
+  .facts div {
+    padding: var(--space-4) var(--space-4) var(--space-4) 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .facts dd {
+    margin: var(--space-1) 0 0;
+    font-size: var(--step-0);
+  }
+</style>

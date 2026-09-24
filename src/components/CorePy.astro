@@ -1,0 +1,1051 @@
+---
+/**
+ * § IV core.py: the podcast. Latest episode plate with an inline player,
+ * cover and numbers, listen-on links, and the full episode index.
+ * Data lives in src/data/corepy.ts.
+ */
+import SectionHead from "./SectionHead.astro";
+import { corepy, episodes, type CorePyEpisode } from "../data/corepy";
+
+const INITIAL = 8;
+
+const latest = episodes[0];
+const shown = episodes.slice(0, INITIAL);
+const rest = episodes.slice(INITIAL);
+
+const totalSeconds = episodes.reduce((sum, e) => sum + e.seconds, 0);
+const totalHours = Math.floor(totalSeconds / 3600);
+const sinceYear = corepy.startDate.slice(0, 4);
+
+/** "01:42:23" -> "1:42:23", "00:42:47" -> "42:47" */
+function runtime(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  const ss = String(s).padStart(2, "0");
+  return h ? `${h}:${String(m).padStart(2, "0")}:${ss}` : `${m}:${ss}`;
+}
+
+/** Machine-readable ISO 8601 duration for <time datetime>. */
+function isoDuration(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return `PT${h ? `${h}H` : ""}${m}M${s}S`;
+}
+
+function longDate(iso: string): string {
+  return new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+const listen = [
+  { label: "Apple Podcasts", href: corepy.links.apple },
+  { label: "Spotify", href: corepy.links.spotify },
+  { label: "YouTube", href: corepy.links.youtube },
+  { label: "Pocket Casts", href: corepy.links.pocketCasts },
+  { label: "RSS feed", href: corepy.links.rss },
+];
+
+const playData = (e: CorePyEpisode) => ({
+  "data-play": "",
+  "data-src": e.audio,
+  "data-num": e.number,
+  "data-title": e.title,
+  "data-seconds": String(e.seconds),
+});
+---
+
+<section id="corepy" class="corepy wrap" data-corepy>
+  <SectionHead
+    num="IV"
+    title="core.py"
+    kicker="$ podcast --hosts pablo łukasz"
+    lede="core.py is the podcast where Łukasz Langa and I talk about what's happening inside CPython, from the people who build it. Long episodes, real internals, the occasional guest."
+  />
+
+  <div class="stage">
+    <article class="plate reveal" aria-labelledby="corepy-latest">
+      <header class="plate__bar">
+        <span class="label"><span class="ember">●</span> Latest episode</span>
+        <span class="label">
+          <time datetime={latest.date}>{longDate(latest.date)}</time>
+          <span aria-hidden="true"> · </span>
+          <time datetime={isoDuration(latest.seconds)}>{runtime(latest.seconds)}</time>
+        </span>
+      </header>
+
+      <div class="plate__body">
+        <p class="plate__num" aria-hidden="true">
+          <span class="plate__no mono">No.</span>
+          <span class="display">{latest.number}</span>
+        </p>
+        <div class="plate__text">
+          <h3 id="corepy-latest" class="plate__title">
+            <span class="visually-hidden">Episode {latest.number}: </span>
+            {latest.title}
+          </h3>
+          <p class="plate__summary">{latest.summary}</p>
+        </div>
+      </div>
+
+      <div class="player" data-player>
+        <audio
+          class="player__native"
+          controls
+          preload="none"
+          src={latest.audio}
+          data-audio
+          data-num={latest.number}
+          data-seconds={latest.seconds}
+        >
+          <a href={latest.url}>Listen to episode {latest.number}</a>
+        </audio>
+        <div class="player__ui" hidden data-ui>
+          <button
+            class="pbtn pbtn--big"
+            type="button"
+            aria-label={`Play episode ${latest.number}`}
+            data-toggle
+          >
+            <svg class="i-play" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M4.5 2.5v11l9-5.5z"></path>
+            </svg>
+            <svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M4 2.5h2.6v11H4zM9.4 2.5H12v11H9.4z"></path>
+            </svg>
+          </button>
+          <div class="player__track">
+            <p class="player__now label" data-now>
+              No. {latest.number} · {latest.title}
+            </p>
+            <input
+              class="seek"
+              type="range"
+              min="0"
+              max={latest.seconds}
+              step="1"
+              value="0"
+              aria-label="Seek"
+              data-seek
+            />
+          </div>
+          <p class="player__time mono" data-time>
+            <span data-cur>0:00</span><span class="player__sep">/</span><span
+              data-dur>{runtime(latest.seconds)}</span
+            >
+          </p>
+        </div>
+      </div>
+
+      <footer class="plate__links">
+        {
+          latest.youtube && (
+            <a href={latest.youtube}>
+              Watch on YouTube <span aria-hidden="true">↗</span>
+            </a>
+          )
+        }
+        <a href={latest.url}>
+          Episode page <span aria-hidden="true">↗</span>
+        </a>
+      </footer>
+    </article>
+
+    <aside class="folio reveal" aria-label="About the show">
+      <div class="folio__top">
+        <figure class="cover">
+          <img
+            src={corepy.cover}
+            alt="core.py cover art: three snakes knotted into an atom around the words CORE PY"
+            width="800"
+            height="800"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <dl class="stats">
+          <div>
+            <dt class="label">Episodes</dt>
+            <dd>{episodes.length}</dd>
+          </div>
+          <div>
+            <dt class="label">Hours of audio</dt>
+            <dd>{totalHours}</dd>
+          </div>
+          <div>
+            <dt class="label">On air since</dt>
+            <dd>{sinceYear}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <pre class="doc" aria-label="The show's description, from its feed"><span class="ember">&gt;&gt;&gt;</span> core.__doc__
+<span class="doc__out">'{corepy.tagline}'</span></pre>
+
+    </aside>
+
+    <nav class="listen reveal" aria-label="Listen to core.py">
+      <p class="label">Listen on</p>
+      <ul>
+        {
+          listen.map((l) => (
+            <li>
+              <a href={l.href}>
+                <span>{l.label}</span>
+                <span class="listen__arrow" aria-hidden="true">
+                  ↗
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+
+  <div class="index reveal">
+    <div class="index__head">
+      <h3 class="label index__title">Index of episodes</h3>
+      <p class="label index__cols" aria-hidden="true">
+        <span>aired</span><span>runtime</span>
+      </p>
+    </div>
+
+    {
+      [shown, rest].map((list, i) => {
+        const rows = (
+          <ol class="toc" role="list">
+            {list.map((e) => (
+              <li class:list={["row", { "is-latest": e === latest }]}>
+                <span class="row__num mono">
+                  <span class="visually-hidden">Episode </span>
+                  {e.number}
+                </span>
+                <a class="row__title" href={e.url}>
+                  {e.title}
+                </a>
+                <span class="row__lead" aria-hidden="true" />
+                <span class="row__meta mono">
+                  <time datetime={e.date}>{e.date}</time>
+                  <time class="row__dur" datetime={isoDuration(e.seconds)}>
+                    {runtime(e.seconds)}
+                  </time>
+                </span>
+                <button
+                  class="pbtn row__play"
+                  type="button"
+                  hidden
+                  aria-label={`Play episode ${e.number}: ${e.title}`}
+                  {...playData(e)}
+                >
+                  <svg class="i-play" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M4.5 2.5v11l9-5.5z" />
+                  </svg>
+                  <svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M4 2.5h2.6v11H4zM9.4 2.5H12v11H9.4z" />
+                  </svg>
+                </button>
+              </li>
+            ))}
+          </ol>
+        );
+        return i === 0 ? (
+          rows
+        ) : (
+          <details class="more">
+            <summary class="mono">
+              <span class="more__sign" aria-hidden="true" />
+              <span class="more__closed">Show all {episodes.length} episodes</span>
+              <span class="more__open">Show fewer</span>
+            </summary>
+            {rows}
+          </details>
+        );
+      })
+    }
+  </div>
+</section>
+
+<style>
+  .corepy {
+    padding-block: var(--space-8) var(--space-7);
+  }
+
+  /* ─── stage: plate + folio ─── */
+  .stage {
+    display: grid;
+    grid-template-areas: "plate" "folio" "listen";
+    gap: var(--space-6);
+  }
+  .plate {
+    grid-area: plate;
+  }
+  .folio {
+    grid-area: folio;
+  }
+  .listen {
+    grid-area: listen;
+  }
+  @media (min-width: 60rem) {
+    .stage {
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+      grid-template-rows: auto 1fr;
+      grid-template-areas:
+        "plate folio"
+        "listen folio";
+      column-gap: var(--space-6);
+      row-gap: var(--space-5);
+      align-items: start;
+    }
+  }
+
+  /* ─── latest episode plate ─── */
+  .plate {
+    position: relative;
+    border: 1px solid var(--line);
+    background: var(--ink-2);
+  }
+  /* engraver's corner ticks */
+  .plate::before,
+  .plate::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    pointer-events: none;
+  }
+  .plate::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid var(--ember);
+    border-left: 1px solid var(--ember);
+  }
+  .plate::after {
+    right: -1px;
+    bottom: -1px;
+    border-right: 1px solid var(--ember);
+    border-bottom: 1px solid var(--ember);
+  }
+
+  .plate__bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--line);
+  }
+  .plate__bar .ember {
+    font-size: 0.8em;
+  }
+
+  .plate__body {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-4) var(--space-5);
+  }
+  .plate__num {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    line-height: 0.8;
+  }
+  .plate__num .display {
+    font-size: clamp(4.5rem, 3rem + 6vw, 8.5rem);
+    font-weight: 600;
+    color: var(--bone);
+  }
+  .plate__no {
+    font-size: var(--step--2);
+    letter-spacing: 0.12em;
+    color: var(--ember);
+    padding-top: 0.5em;
+  }
+  .plate__text {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+  }
+  .plate__title {
+    font-size: var(--step-2);
+    line-height: 1.1;
+  }
+  .plate__summary {
+    color: var(--ash);
+    max-width: 36rem;
+  }
+
+  @media (min-width: 40rem) {
+    .plate__body {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: var(--space-6);
+      padding: var(--space-6) var(--space-5);
+    }
+    .plate__bar {
+      padding-inline: var(--space-5);
+    }
+  }
+
+  /* ─── player ─── */
+  .player {
+    border-top: 1px solid var(--line);
+    padding: var(--space-4);
+  }
+  .player__native {
+    width: 100%;
+    height: 2.5rem;
+    color-scheme: dark;
+  }
+  .player__ui:not([hidden]) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "btn track"
+      "btn time";
+    align-items: center;
+    column-gap: var(--space-4);
+    row-gap: var(--space-1);
+  }
+  .player__ui .pbtn--big {
+    grid-area: btn;
+  }
+  .player__track {
+    grid-area: track;
+    display: grid;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+  .player__now {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .player__time {
+    grid-area: time;
+    margin: 0;
+    font-size: var(--step--2);
+    color: var(--dust);
+    font-variant-numeric: tabular-nums;
+  }
+  .player__sep {
+    margin-inline: 0.5em;
+    color: var(--line-2);
+  }
+  .is-active [data-cur] {
+    color: var(--bone);
+  }
+  @media (min-width: 40rem) {
+    .player {
+      padding: var(--space-4) var(--space-5);
+    }
+    .player__ui:not([hidden]) {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: "btn track time";
+      column-gap: var(--space-5);
+    }
+    .player__time {
+      align-self: end;
+      padding-bottom: 1px;
+    }
+  }
+
+  /* play / pause buttons */
+  .pbtn {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid var(--line-2);
+    border-radius: 0;
+    background: transparent;
+    color: var(--bone);
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      color 0.2s,
+      background 0.2s;
+  }
+  .pbtn[hidden] {
+    display: none;
+  }
+  .pbtn svg {
+    width: 0.7rem;
+    height: 0.7rem;
+    fill: currentColor;
+  }
+  .pbtn .i-pause,
+  .pbtn.is-playing .i-play {
+    display: none;
+  }
+  .pbtn.is-playing .i-pause {
+    display: block;
+  }
+  .pbtn:hover,
+  .pbtn.is-playing {
+    border-color: var(--ember);
+    color: var(--ember);
+  }
+  .pbtn--big {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+  .pbtn--big svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /* hairline seek bar */
+  .seek {
+    --p: 0%;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 1rem;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+  .seek::-webkit-slider-runnable-track {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      var(--ember) var(--p),
+      var(--line-2) var(--p)
+    );
+  }
+  .seek::-moz-range-track {
+    height: 1px;
+    background: var(--line-2);
+  }
+  .seek::-moz-range-progress {
+    height: 1px;
+    background: var(--ember);
+  }
+  .seek::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 7px;
+    height: 7px;
+    margin-top: -3px;
+    border: 0;
+    border-radius: 0;
+    background: var(--bone);
+  }
+  .seek::-moz-range-thumb {
+    width: 7px;
+    height: 7px;
+    border: 0;
+    border-radius: 0;
+    background: var(--bone);
+  }
+  .seek:hover::-webkit-slider-thumb {
+    background: var(--ember);
+  }
+  .seek:focus-visible {
+    outline: 1px solid var(--ember);
+    outline-offset: 2px;
+  }
+
+  .plate__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--line);
+    font-family: var(--f-mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .plate__links a {
+    color: var(--ash);
+    text-decoration: none;
+  }
+  .plate__links a:hover {
+    color: var(--ember);
+  }
+  @media (min-width: 40rem) {
+    .plate__links {
+      padding-inline: var(--space-5);
+    }
+  }
+
+  /* ─── folio: cover, numbers, doc, listen ─── */
+  .folio {
+    display: grid;
+    gap: var(--space-5);
+    align-content: start;
+  }
+  .folio__top {
+    display: grid;
+    grid-template-columns: minmax(0, 9rem) minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: start;
+  }
+  @media (min-width: 40rem) and (max-width: 59.99rem) {
+    .folio {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: var(--space-6);
+      align-items: center;
+    }
+    .folio__top {
+      grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+    }
+  }
+  @media (min-width: 60rem) {
+    .folio__top {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-5);
+    }
+  }
+
+  .cover {
+    margin: 0;
+    border: 1px solid var(--line);
+    padding: 5px;
+    background: var(--ink);
+  }
+  .cover img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    filter: grayscale(1) contrast(1.35) brightness(0.85);
+    transition: filter 0.8s ease;
+  }
+  .cover:hover img {
+    filter: grayscale(0) contrast(1) brightness(1);
+  }
+
+  .stats {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+  }
+  .stats div {
+    display: grid;
+    gap: 0.1rem;
+    border-top: 1px solid var(--line);
+    padding-top: var(--space-2);
+  }
+  .stats dd {
+    margin: 0;
+    font-size: var(--step-2);
+    line-height: 1;
+    color: var(--bone);
+    order: -1;
+  }
+  @media (min-width: 60rem) {
+    .stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-3);
+    }
+    .stats dt {
+      font-size: 0.62rem;
+    }
+  }
+
+  .doc {
+    margin: 0;
+    padding-left: var(--space-3);
+    border-left: 1px solid var(--line-2);
+    font-size: var(--step--1);
+    line-height: 1.6;
+    color: var(--ash);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .doc__out {
+    color: var(--dust);
+  }
+
+  .listen ul {
+    margin: var(--space-2) 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-4);
+  }
+  @media (min-width: 48rem) {
+    .listen ul {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(max-content, 1fr);
+      column-gap: 0;
+      border-top: 1px solid var(--line);
+    }
+    .listen li {
+      display: flex;
+    }
+    .listen li + li a {
+      border-left: 1px solid var(--line);
+    }
+    .listen a {
+      flex: 1;
+      padding: 0.8rem var(--space-3);
+      white-space: nowrap;
+    }
+  }
+  .listen a {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding-block: 0.55rem;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--f-mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bone);
+    text-decoration: none;
+  }
+  .listen__arrow {
+    color: var(--dust);
+    transition:
+      color 0.2s,
+      transform 0.2s;
+  }
+  .listen a:hover,
+  .listen a:hover .listen__arrow {
+    color: var(--ember);
+  }
+  .listen a:hover .listen__arrow {
+    transform: translate(2px, -2px);
+  }
+
+  /* ─── the index ─── */
+  .index {
+    margin-top: var(--space-7);
+  }
+  .index__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--line-2);
+  }
+  .index__title {
+    color: var(--ash);
+  }
+  .index__cols {
+    display: none;
+  }
+
+  .toc {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+    grid-template-areas:
+      "num title play"
+      "num meta play";
+    column-gap: var(--space-3);
+    row-gap: 0.15rem;
+    align-items: baseline;
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--line);
+  }
+  .row__num {
+    grid-area: num;
+    font-size: var(--step--1);
+    color: var(--dust);
+    font-variant-numeric: tabular-nums;
+  }
+  .is-latest .row__num {
+    color: var(--ember);
+  }
+  .row__title {
+    grid-area: title;
+    font-size: var(--step-0);
+    line-height: 1.25;
+    color: var(--bone);
+    text-decoration: none;
+  }
+  .row__title:hover {
+    color: var(--ember);
+  }
+  .row__lead {
+    display: none;
+  }
+  .row__meta {
+    grid-area: meta;
+    display: flex;
+    gap: var(--space-3);
+    font-size: var(--step--2);
+    letter-spacing: 0.04em;
+    color: var(--dust);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .row__play {
+    grid-area: play;
+    align-self: center;
+  }
+  .row.is-current .row__num {
+    color: var(--ember);
+  }
+
+  @media (min-width: 48rem) {
+    .index__cols {
+      display: flex;
+      gap: var(--space-5);
+      padding-right: calc(2rem + var(--space-4));
+    }
+    .index__cols span:first-child {
+      width: 11ch;
+    }
+    .index__cols span:last-child {
+      width: 7ch;
+      text-align: right;
+    }
+    .row {
+      grid-template-columns:
+        3.5rem minmax(0, max-content) minmax(2.5rem, 1fr)
+        auto auto;
+      grid-template-areas: "num title lead meta play";
+      column-gap: var(--space-4);
+      align-items: last baseline;
+      padding-block: 0.7rem;
+    }
+    .row__lead {
+      display: block;
+      grid-area: lead;
+      overflow: hidden;
+      white-space: nowrap;
+      font-family: var(--f-mono);
+      font-size: var(--step--2);
+      letter-spacing: 0.35em;
+      color: var(--line-2);
+    }
+    .row__lead::before {
+      content: "................................................................................................................................................................";
+    }
+    .row:hover .row__lead {
+      color: var(--dust);
+    }
+    .row__meta {
+      gap: var(--space-5);
+    }
+    .row__meta time:first-child {
+      width: 11ch;
+    }
+    .row__dur {
+      width: 7ch;
+      text-align: right;
+    }
+    .row__title {
+      font-size: var(--step-1);
+    }
+    .row__play {
+      align-self: center;
+    }
+  }
+
+  /* disclosure */
+  .more summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: fit-content;
+    margin-top: var(--space-5);
+    padding: 0.7em 1.1em;
+    border: 1px solid var(--line-2);
+    font-size: var(--step--2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bone);
+    cursor: pointer;
+    list-style: none;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+  }
+  .more summary::-webkit-details-marker {
+    display: none;
+  }
+  .more summary:hover {
+    border-color: var(--ember);
+    color: var(--ember);
+  }
+  .more__sign {
+    position: relative;
+    width: 9px;
+    height: 9px;
+  }
+  .more__sign::before,
+  .more__sign::after {
+    content: "";
+    position: absolute;
+    background: var(--ember);
+  }
+  .more__sign::before {
+    left: 0;
+    right: 0;
+    top: 4px;
+    height: 1px;
+  }
+  .more__sign::after {
+    top: 0;
+    bottom: 0;
+    left: 4px;
+    width: 1px;
+    transition: transform 0.3s ease;
+  }
+  .more[open] .more__sign::after {
+    transform: scaleY(0);
+  }
+  .more__open,
+  .more[open] .more__closed {
+    display: none;
+  }
+  .more[open] .more__open {
+    display: inline;
+  }
+  .more[open] summary {
+    margin-bottom: var(--space-3);
+  }
+</style>
+
+<script>
+  function fmt(t: number): string {
+    if (!Number.isFinite(t) || t < 0) t = 0;
+    const s = Math.floor(t % 60);
+    const m = Math.floor((t / 60) % 60);
+    const h = Math.floor(t / 3600);
+    const ss = String(s).padStart(2, "0");
+    return h ? `${h}:${String(m).padStart(2, "0")}:${ss}` : `${m}:${ss}`;
+  }
+
+  function init(root: HTMLElement) {
+    const audio = root.querySelector<HTMLAudioElement>("[data-audio]");
+    const ui = root.querySelector<HTMLElement>("[data-ui]");
+    const toggle = root.querySelector<HTMLButtonElement>("[data-toggle]");
+    const seek = root.querySelector<HTMLInputElement>("[data-seek]");
+    const now = root.querySelector<HTMLElement>("[data-now]");
+    const cur = root.querySelector<HTMLElement>("[data-cur]");
+    const dur = root.querySelector<HTMLElement>("[data-dur]");
+    const player = root.querySelector<HTMLElement>("[data-player]");
+    if (!audio || !ui || !toggle || !seek || !now || !cur || !dur || !player)
+      return;
+
+    const rowButtons = Array.from(
+      root.querySelectorAll<HTMLButtonElement>("[data-play]"),
+    );
+
+    // enhance: swap native controls for ours
+    audio.controls = false;
+    audio.hidden = true;
+    ui.hidden = false;
+    rowButtons.forEach((b) => (b.hidden = false));
+
+    let num = audio.dataset.num ?? "";
+    let total = Number(audio.dataset.seconds) || 0;
+    let src = audio.currentSrc || audio.getAttribute("src") || "";
+    let dragging = false;
+
+    const paint = () => {
+      const t = audio.currentTime;
+      const d = Number.isFinite(audio.duration) ? audio.duration : total;
+      if (!dragging) seek.value = String(Math.floor(t));
+      const v = Number(seek.value);
+      seek.style.setProperty("--p", `${d ? (v / d) * 100 : 0}%`);
+      cur.textContent = fmt(v);
+      seek.setAttribute("aria-valuetext", `${fmt(v)} of ${fmt(d)}`);
+    };
+
+    const sync = () => {
+      const playing = !audio.paused && !audio.ended;
+      player.classList.toggle("is-active", audio.currentTime > 0 || playing);
+      toggle.classList.toggle("is-playing", playing);
+      toggle.setAttribute(
+        "aria-label",
+        `${playing ? "Pause" : "Play"} episode ${num}`,
+      );
+      for (const b of rowButtons) {
+        const mine = b.dataset.src === src;
+        const on = mine && playing;
+        b.classList.toggle("is-playing", on);
+        b.closest(".row")?.classList.toggle("is-current", mine && audio.currentTime > 0);
+        b.setAttribute(
+          "aria-label",
+          `${on ? "Pause" : "Play"} episode ${b.dataset.num}: ${b.dataset.title}`,
+        );
+      }
+    };
+
+    const play = () => {
+      audio.play().catch(() => {
+        now.textContent = "Could not load audio. Try the episode page.";
+      });
+    };
+
+    toggle.addEventListener("click", () => (audio.paused ? play() : audio.pause()));
+
+    for (const b of rowButtons) {
+      b.addEventListener("click", () => {
+        if (b.dataset.src === src) {
+          audio.paused ? play() : audio.pause();
+          return;
+        }
+        src = b.dataset.src ?? "";
+        num = b.dataset.num ?? "";
+        total = Number(b.dataset.seconds) || 0;
+        audio.src = src;
+        seek.max = String(total);
+        seek.value = "0";
+        now.textContent = `No. ${num} · ${b.dataset.title ?? ""}`;
+        dur.textContent = fmt(total);
+        paint();
+        play();
+      });
+    }
+
+    seek.addEventListener("input", () => {
+      dragging = true;
+      paint();
+    });
+    seek.addEventListener("change", () => {
+      audio.currentTime = Number(seek.value);
+      dragging = false;
+      paint();
+      sync();
+    });
+
+    audio.addEventListener("loadedmetadata", () => {
+      if (Number.isFinite(audio.duration)) {
+        seek.max = String(Math.floor(audio.duration));
+        dur.textContent = fmt(audio.duration);
+      }
+    });
+    audio.addEventListener("timeupdate", () => {
+      paint();
+      if (audio.currentTime > 0) player.classList.add("is-active");
+    });
+    for (const ev of ["play", "pause", "ended", "emptied"]) {
+      audio.addEventListener(ev, sync);
+    }
+    audio.addEventListener("ended", () => {
+      audio.currentTime = 0;
+      paint();
+    });
+
+    paint();
+    sync();
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-corepy]")
+    .forEach((el) => init(el));
+</script>
