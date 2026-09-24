@@ -1,4 +1,505 @@
 ---
-// STUB: to be replaced
+/**
+ * § VI Podcasts: guest episodes on other people's shows (main list),
+ * streams and video interviews (secondary list), and a short coda about
+ * Esferas Invisibles, the Spanish science podcast I co-host.
+ * All data lives in src/data/podcasts.ts; every count here is computed.
+ */
+import SectionHead from "./SectionHead.astro";
+import {
+  appearances,
+  shows,
+  esferas,
+  esferasEpisodes,
+  type Appearance,
+  type Lang,
+} from "../data/podcasts";
+
+/** Rows visible before "Show all". */
+const VISIBLE = 8;
+
+const all = [...appearances].sort((a, b) => b.date.localeCompare(a.date));
+const audio = all.filter((a) => a.kind === "audio");
+const video = all.filter((a) => a.kind === "video");
+const audioShown = audio.slice(0, VISIBLE);
+const audioRest = audio.slice(VISIBLE);
+
+/* ── tally ── */
+const recordings = all.filter((a) => !a.rerunOf);
+const showCount = new Set(all.map((a) => a.show)).size;
+const spanish = recordings.filter((a) => a.lang === "es").length;
+const firstYear = Math.min(...all.map((a) => Number(a.date.slice(0, 4))));
+const perShow = Object.entries(
+  recordings.reduce<Record<string, number>>((acc, a) => {
+    acc[a.show] = (acc[a.show] ?? 0) + 1;
+    return acc;
+  }, {}),
+)
+  .map(([id, n]) => ({ name: shows[id as keyof typeof shows].name, n }))
+  .sort((a, b) => b.n - a.n || a.name.localeCompare(b.name));
+const regulars = perShow.filter((s) => s.n > 1);
+
+const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+const word = (n: number) => words[n] ?? String(n);
+const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
+const list = (xs: string[]) =>
+  xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`;
+
+/* ── Esferas numbers ── */
+const esferasHours = Math.round(esferasEpisodes.reduce((s, e) => s + e.seconds, 0) / 3600);
+const esferasSeasons = new Set(esferasEpisodes.map((e) => e.season)).size;
+const esferasFrom = esferasEpisodes.at(-1)!.date.slice(0, 4);
+const esferasTo = esferasEpisodes[0].date.slice(0, 4);
+
+/* ── helpers ── */
+const langName: Record<Lang, string> = { en: "English", es: "Spanish" };
+const epLabel = (a: Appearance) =>
+  a.episode ? (/^\d+$/.test(a.episode) ? `#${a.episode}` : a.episode) : "";
+const showName = (a: Appearance) => shows[a.show].name;
+const fullLabel = (a: Appearance) => `${showName(a)} ${epLabel(a)}`.trim();
+const originalOf = (a: Appearance) => all.find((x) => x.key === a.rerunOf)!;
+const watch = (id: string) => `https://www.youtube.com/watch?v=${id}`;
+function runtime(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  return h ? `${h}h ${String(m).padStart(2, "0")}m` : `${m}m`;
+}
+
+const lede =
+  "I also talk about CPython on other people's shows. These are the recordings that I know about, newest first.";
 ---
-<section id="podcasts" class="wrap" style="padding-block:6rem"><p class="label">Podcasts (stub)</p></section>
+
+<section id="podcasts" class="pods wrap">
+  <SectionHead num="VI" title="Podcasts" kicker="guest appearances" lede={lede} />
+
+  <div class="cols">
+    <!-- ─── main block: podcast episodes ─── -->
+    <div class="main reveal">
+      <p class="tally">
+        {recordings.length} recordings on {showCount} shows since {firstYear}. {cap(word(spanish))} are in Spanish.
+        {
+          regulars.length > 0 &&
+            ` I was on ${list(regulars.map((s) => `${s.name} ${word(s.n)} times`))}.`
+        }
+      </p>
+
+      <h3 class="label head">
+        Podcast episodes <span class="head__n">{audio.length}</span>
+      </h3>
+
+      {
+        [audioShown, audioRest].map((rows, i) => {
+          const ol = (
+            <ol class="rows" role="list">
+              {rows.map((a) => (
+                <li
+                  class:list={["row", { "is-rerun": a.rerunOf }]}
+                  id={a.key ? `pod-${a.key}` : undefined}
+                >
+                  <p class="label meta">
+                    <time datetime={a.date}>{a.date}</time>
+                    <span class="meta__show">
+                      {showName(a)}
+                      {a.episode && <span class="meta__no"> {epLabel(a)}</span>}
+                    </span>
+                    {a.lang !== "en" && (
+                      <span class="tag" title={langName[a.lang]}>
+                        <span aria-hidden="true">{a.lang}</span>
+                        <span class="visually-hidden">in {langName[a.lang]}</span>
+                      </span>
+                    )}
+                  </p>
+                  <a class="row__title" href={a.url} lang={a.lang}>
+                    {a.title}
+                  </a>
+                  {a.rerunOf ? (
+                    <p class="small">
+                      A rerun: the same recording as{" "}
+                      <a href={`#pod-${a.rerunOf}`}>{fullLabel(originalOf(a))}</a>.
+                    </p>
+                  ) : (
+                    <>
+                      <p class="small">{a.summary}</p>
+                      <p class="small people">
+                        {a.with?.length ? `With ${list(a.with)}. ` : ""}Host: {a.host}.
+                        {a.youtube && (
+                          <>
+                            {" "}
+                            <a href={watch(a.youtube)}>Video</a>.
+                          </>
+                        )}
+                        {a.alt?.map((l) => (
+                          <>
+                            {" "}
+                            <a href={l.href}>{l.label}</a>.
+                          </>
+                        ))}
+                      </p>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ol>
+          );
+          return i === 0 ? (
+            ol
+          ) : rows.length > 0 ? (
+            <details class="more">
+              <summary class="btn">
+                <span class="more__sign" aria-hidden="true">+</span>
+                <span class="more__closed">Show all {audio.length}</span>
+                <span class="more__open">Show fewer</span>
+              </summary>
+              {ol}
+            </details>
+          ) : null;
+        })
+      }
+    </div>
+
+    <!-- ─── secondary list: streams and interviews ─── -->
+    <aside class="side reveal" aria-labelledby="pod-video">
+      <h3 id="pod-video" class="label head">
+        Streams and interviews <span class="head__n">{video.length}</span>
+      </h3>
+      <ol class="rows" role="list">
+        {
+          video.map((a) => (
+            <li class="row">
+              <p class="label meta">
+                <time datetime={a.date}>{a.date}</time>
+                <span class="meta__show">{showName(a)}</span>
+                {a.lang !== "en" && (
+                  <span class="tag" title={langName[a.lang]}>
+                    <span aria-hidden="true">{a.lang}</span>
+                    <span class="visually-hidden">in {langName[a.lang]}</span>
+                  </span>
+                )}
+              </p>
+              <a class="row__title" href={a.url} lang={a.lang}>
+                {a.title}
+              </a>
+              <p class="small people">
+                {cap(a.format ?? "video")}. {a.with?.length ? `With ${list(a.with)}. ` : ""}Host:{" "}
+                {a.host}.
+                {a.alt?.map((l) => (
+                  <>
+                    {" "}
+                    <a href={l.href}>{l.label}</a>.
+                  </>
+                ))}
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+    </aside>
+  </div>
+
+  <!-- ─── coda: Esferas Invisibles (the one decorative element: its cover) ─── -->
+  <article class="own reveal" aria-labelledby="esferas-title">
+    <img
+      class="own__cover"
+      src={esferas.cover}
+      alt="Esferas Invisibles cover art: the show name in white capitals over particle tracks"
+      width="80"
+      height="80"
+      loading="lazy"
+      decoding="async"
+    />
+    <div class="own__text">
+      <p class="label meta">
+        <span>My other show</span>
+        <span class="tag" title="Spanish">
+          <span aria-hidden="true">es</span>
+          <span class="visually-hidden">in Spanish</span>
+        </span>
+      </p>
+      <h3 id="esferas-title" class="own__name" lang="es">{esferas.name}</h3>
+      <p class="small">{esferas.about}</p>
+      <p class="small">
+        <span lang="es">“{esferas.tagline}”</span>
+        <span class="own__tr">({esferas.taglineEn})</span>
+      </p>
+      <p class="label meta">
+        <span>{esferasEpisodes.length} episodes</span>
+        <span>{esferasSeasons} seasons</span>
+        <span>{esferasFrom}–{esferasTo}</span>
+        <span>{esferasHours} hours</span>
+      </p>
+      <p class="label links">
+        {
+          esferas.links.map((l) => (
+            <a href={l.href}>
+              {l.label}
+              <span aria-hidden="true"> ↗</span>
+            </a>
+          ))
+        }
+      </p>
+
+      <details class="more">
+        <summary class="btn">
+          <span class="more__sign" aria-hidden="true">+</span>
+          <span class="more__closed">All {esferasEpisodes.length} episodes</span>
+          <span class="more__open">Hide episodes</span>
+        </summary>
+        <ol class="elist" role="list" lang="es">
+          {
+            esferasEpisodes.map((e) => (
+              <li>
+                <span class="label elist__no" lang="en">
+                  <span class="visually-hidden">
+                    Season {e.season}, episode {e.episode}:{" "}
+                  </span>
+                  <span aria-hidden="true">
+                    S{e.season}E{String(e.episode).padStart(2, "0")}
+                  </span>
+                </span>
+                <a href={e.url}>{e.title}</a>
+                <span class="label elist__meta" lang="en">
+                  <time datetime={e.date}>{e.date}</time> · {runtime(e.seconds)}
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+      </details>
+    </div>
+  </article>
+</section>
+
+<style>
+  .pods {
+    padding-block: var(--space-8) var(--space-7);
+  }
+
+  /* three text styles: .label (global, pixel), .row__title, .small */
+    .row__title,
+  .own__name {
+    font-family: var(--f-body);
+    font-size: 1em;
+    line-height: 1.35;
+    color: var(--bone);
+  }
+  .small {
+    max-width: 38rem;
+    font-family: var(--f-body);
+    font-size: var(--step--1);
+    line-height: 1.6;
+    color: var(--ash);
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-7);
+  }
+  @media (min-width: 64rem) {
+    .cols {
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+      column-gap: var(--space-7);
+      align-items: start;
+    }
+  }
+
+  .tally {
+    max-width: 38rem;
+    margin-bottom: var(--space-6);
+    font-family: var(--f-body);
+    font-size: var(--step--1);
+    line-height: 1.6;
+    color: var(--ash);
+  }
+
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
+    padding-bottom: var(--space-3);
+    color: var(--bone);
+  }
+  .head__n {
+    color: var(--ember);
+  }
+
+  .rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .row {
+    display: grid;
+    gap: var(--space-2);
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--line);
+    scroll-margin-top: 5rem;
+  }
+  .side .row {
+    padding-block: var(--space-4);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem var(--space-4);
+  }
+  .meta time {
+    font-variant-numeric: tabular-nums;
+  }
+  .meta__show {
+    color: var(--ash);
+  }
+  .meta__no {
+    color: var(--ember);
+  }
+  .tag {
+    padding: 0 0.4em;
+    border: 2px solid var(--ember);
+    color: var(--bone);
+    line-height: 1.5;
+  }
+
+  .row__title {
+    width: fit-content;
+    text-wrap: balance;
+  }
+  .people {
+    color: var(--dust);
+  }
+  .people a,
+  .is-rerun .small a {
+    color: var(--ash);
+  }
+  .people a:hover,
+  .is-rerun .small a:hover {
+    color: var(--ember);
+  }
+  .is-rerun .row__title {
+    color: var(--ash);
+  }
+  .row:target {
+    outline: 2px solid var(--ember);
+    outline-offset: 4px;
+  }
+
+  /* show all / show fewer */
+  .more summary {
+    margin-top: var(--space-5);
+    font-size: var(--step--2);
+    cursor: pointer;
+    list-style: none;
+  }
+  .more summary::-webkit-details-marker {
+    display: none;
+  }
+  .more__sign {
+    color: var(--ember);
+  }
+  .more summary:hover .more__sign {
+    color: var(--ink);
+  }
+  .more[open] .more__sign {
+    visibility: hidden;
+    position: relative;
+  }
+  .more[open] .more__sign::after {
+    content: "-";
+    visibility: visible;
+    position: absolute;
+    left: 0;
+  }
+  .more__open,
+  .more[open] .more__closed {
+    display: none;
+  }
+  .more[open] .more__open {
+    display: inline;
+  }
+  .main .more[open] .rows {
+    margin-top: var(--space-4);
+  }
+
+  /* ─── coda: Esferas Invisibles ─── */
+  .own {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: var(--space-8);
+  }
+  @media (min-width: 40rem) {
+    .own {
+      grid-template-columns: 10rem minmax(0, 1fr);
+      gap: var(--space-6);
+      align-items: start;
+    }
+  }
+  @media (min-width: 64rem) {
+    .own {
+      grid-template-columns: 14rem minmax(0, 1fr);
+    }
+  }
+  .own__cover {
+    width: 10rem;
+    height: auto;
+    aspect-ratio: 1;
+    image-rendering: pixelated;
+    border: 2px solid var(--bone);
+    box-shadow: 4px 4px 0 var(--ember);
+  }
+  @media (min-width: 64rem) {
+    .own__cover {
+      width: 14rem;
+    }
+  }
+  .own__text {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+    min-width: 0;
+  }
+  .own__name {
+    font-size: var(--step-1);
+  }
+  .own__tr {
+    color: var(--dust);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+  }
+  .links a {
+    color: var(--ash);
+    text-decoration: none;
+  }
+  .links a:hover {
+    color: var(--ember);
+  }
+
+  .elist {
+    max-width: 44rem;
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .elist li {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    column-gap: var(--space-3);
+    row-gap: 0.1rem;
+    align-items: baseline;
+    padding-block: var(--space-2);
+    border-top: 1px solid var(--line);
+    font-family: var(--f-body);
+    font-size: var(--step--1);
+  }
+  .elist__no {
+    grid-row: span 2;
+    color: var(--ember);
+  }
+  .elist li a {
+    width: fit-content;
+  }
+</style>

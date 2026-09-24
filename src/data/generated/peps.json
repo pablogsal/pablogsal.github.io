@@ -1,0 +1,225 @@
+{
+  "fetchedAt": "2026-09-24T16:46:37.128Z",
+  "peps": [
+    {
+      "authors": [
+        "Larry Hastings",
+        "Pablo Galindo Salgado",
+        "Mario Corchero",
+        "Eric N. Vander Weele"
+      ],
+      "created": "2018-01-20",
+      "number": 570,
+      "python_version": "3.8",
+      "status": "Final",
+      "title": "Python Positional-Only Parameters",
+      "type": "Standards Track",
+      "url": "https://peps.python.org/pep-0570/"
+    },
+    {
+      "authors": [
+        "Guido van Rossum",
+        "Pablo Galindo Salgado",
+        "Lysandros Nikolaou"
+      ],
+      "created": "2020-03-24",
+      "number": 617,
+      "python_version": "3.9",
+      "status": "Final",
+      "title": "New PEG parser for CPython",
+      "type": "Standards Track",
+      "url": "https://peps.python.org/pep-0617/"
+    },
+    {
+      "authors": [
+        "Pablo Galindo Salgado"
+      ],
+      "created": "2020-05-25",
+      "number": 619,
+      "python_version": "3.10",
+      "status": "Active",
+      "title": "Python 3.10 Release Schedule",
+      "type": "Informational",
+      "url": "https://peps.python.org/pep-0619/"
+    },
+    {
+      "authors": [
+        "Pablo Galindo Salgado",
+        "Batuhan Taskaya",
+        "Ammar Askar"
+      ],
+      "created": "2021-05-08",
+      "number": 657,
+      "python_version": "3.11",
+      "status": "Final",
+      "title": "Include Fine Grained Error Locations in Tracebacks",
+      "type": "Standards Track",
+      "url": "https://peps.python.org/pep-0657/"
+    },
+    {
+      "authors": [
+        "Pablo Galindo Salgado"
+      ],
+      "created": "2021-07-12",
+      "number": 664,
+      "python_version": "3.11",
+      "status": "Active",
+      "title": "Python 3.11 Release Schedule",
+      "type": "Informational",
+      "url": "https://peps.python.org/pep-0664/"
+    },
+    {
+      "authors": [
+        "Pablo Galindo Salgado",
+        "Stan Ulbrych"
+      ],
+      "created": "2022-01-07",
+      "number": 679,
+      "python_version": "3.15",
+      "status": "Rejected",
+      "title": "New assert statement syntax with parentheses",
+      "type": "Standards Track",
+      "url": "https://peps.python.org/pep-0679/"
+    },
+    {
+      "authors": [
+        "Pablo Galindo Salgado",
+        "Batuhan Taskaya",
+        "Lysandros Nikolaou",
+        "Marta Gómez Macías"
+      ],
+      "created": "2022-11-15",
+      "number": 701,
+      "python_version": "3.12",
+      "status": "Final",
+      "title": "Syntactic formalization of f-strings",
+      "type": "Standards Track",
+      "url": "https://peps.python.org/pep-0701/"
+    },
+    {
+      "authors": [
+        "Pablo Galindo Salgado",
+        "Brett Cannon"
+      ],
+      "created": "2024-09-30",
+      "number": 758,
+      "python_version": "3.14",
+      "status": "Final",
+      "title": "Allow ``except`` and ``except*`` expressions without parentheses",
+      "type": "Standards Track",
+      "url": "https://peps.python.org/pep-0758/"
+    },
+    {
+      "authors": [
+        "Pablo Galindo Salgado",
+        "Brett Cannon"
+      ],
+      "created": "2024-10-02",
+      "number": 760,
+      "python_version": "3.14",
+      "status": "Withdrawn",
+      "title": "No More Bare Excepts",
+      "type": "Standards Track",
+      "url": "https://peps.python.org/pep-0760/"
+    },
+    {
+      "authors": [
+        "Pablo Galindo Salgado",
+        "Łukasz Langa",
+        "Lysandros Nikolaou",
+        "Emily Morehouse-Valcarcel"
+      ],
+      "created": "2024-10-11",
+      "number": 762,
+      "python_version": "3.13",
+      "status": "Final",
+      "title": "REPL-acing the default REPL",
+      "type": "Informational",
+      "url": "https://peps.python.org/pep-0762/"
+    },
+    {
+      "authors": [
+        "Pablo Galindo Salgado",
+        "Matt Wozniski",
+        "Ivona Stojanovic"
+      ],
+      "created": "2024-11-25",
+      "number": 768,
+      "python_version": "3.14",
+      "status": "Final",
+      "title": "Safe external debugger interface for CPython",
+      "type": "Standards Track",
+      "url": "https://peps.python.org/pep-0768/"
+    },
+    {
+      "authors": [
+        "Pablo Galindo Salgado",
+        "László Kiss Kollár"
+      ],
+      "created": "2025-07-21",
+      "number": 799,
+      "python_version": "3.15",
+      "status": "Final",
+      "title": "A dedicated ``profiling`` package for organizing Python profiling tools",
+      "type": "Standards Track",
+      "url": "https://peps.python.org/pep-0799/"
+    },
+    {
+      "authors": [
+        "Pablo Galindo Salgado",
+        "Germán Méndez Bravo",
+        "Thomas Wouters",
+        "Dino Viehland",
+        "Brittany Reynoso",
+        "Noah Kim",
+        "Tim Stumbaugh"
+      ],
+      "created": "2025-10-02",
+      "number": 810,
+      "python_version": "3.15",
+      "status": "Final",
+      "title": "Explicit lazy imports",
+      "type": "Standards Track",
+      "url": "https://peps.python.org/pep-0810/"
+    },
+    {
+      "authors": [
+        "Pablo Galindo Salgado",
+        "Ken Jin",
+        "Savannah Ostrowski",
+        "Diego Russo"
+      ],
+      "created": "2026-03-14",
+      "number": 831,
+      "python_version": "3.15",
+      "status": "Final",
+      "title": "Frame Pointers Everywhere: Enabling System-Level Observability for Python",
+      "type": "Standards Track",
+      "url": "https://peps.python.org/pep-0831/"
+    },
+    {
+      "authors": [
+        "Brett Cannon",
+        "Christian Heimes",
+        "Donald Stufft",
+        "Eric Snow",
+        "Gregory P. Smith",
+        "Łukasz Langa",
+        "Mariatta",
+        "Nathaniel J. Smith",
+        "Pablo Galindo Salgado",
+        "Raymond Hettinger",
+        "Tal Einat",
+        "Tim Peters",
+        "Zachary Ware"
+      ],
+      "created": "2018-08-24",
+      "number": 8001,
+      "python_version": null,
+      "status": "Final",
+      "title": "Python Governance Voting Process",
+      "type": "Process",
+      "url": "https://peps.python.org/pep-8001/"
+    }
+  ]
+}

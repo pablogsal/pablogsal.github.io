@@ -1,62 +1,61 @@
 /**
  * § II: CPython. Everything here is sourced (see the research notes); keep it
  * that way. Descriptions may use `backticks` for inline code.
+ *
+ * The counts (merged PRs, commits, rank) come from `generated/cpython.json` and
+ * the PEP list comes from `generated/peps.json`. A GitHub Action refreshes both
+ * every day. Only the PEP descriptions and the featured set are curated here.
  */
+
+import cpythonData from "./generated/cpython.json";
+import pepsData from "./generated/peps.json";
 
 /* ───────────────────────── types ───────────────────────── */
 
 export interface Stat {
   /** big numeral, already formatted */
   value: string;
-  /** small mono label under it */
+  /** small label under it */
   label: string;
-  /** optional dust-coloured footnote */
-  note?: string;
-  /** optional gold Python-version tags shown under the label */
-  versions?: string[];
-  /** optional per-year series drawn as a tiny bar chart */
-  series?: { year: string; n: number }[];
 }
 
-/** A role drawn as a bar on the timeline. Years are fractional (2020.4 ≈ May 2020). */
+/** One row in the list of roles. */
 export interface Office {
   role: string;
-  from: number;
-  /** omitted = still ongoing */
-  to?: number;
-  /** human readable range, also used for screen readers */
+  /** human readable range, e.g. "2018 to now" */
   range: string;
-  note?: string;
-  /** draw as N equal segments (one per term) */
-  segments?: number;
-  /** ember instead of bone: the headline office */
-  accent?: boolean;
   href?: string;
 }
 
-/** A single dated event, shown as a keyed tick on the timeline axis. */
-export interface Milestone {
-  at: number;
-  date: string;
-  title: string;
-  detail?: string;
-  href?: string;
-}
-
-export type PepStatus = "Final" | "Active" | "Rejected" | "Withdrawn";
+/** Statuses from PEP 1. The generated data can in principle carry others. */
+export type PepStatus =
+  | "Draft"
+  | "Active"
+  | "Accepted"
+  | "Provisional"
+  | "Final"
+  | "Deferred"
+  | "Rejected"
+  | "Withdrawn"
+  | "Superseded";
 
 export interface Pep {
   number: number;
+  /** from the PEP index; may use `backticks` for inline code */
   title: string;
   status: PepStatus;
-  /** Python version it shipped in; null for process PEPs */
+  /** "Standards Track", "Informational" or "Process" */
+  type: string;
+  /** Python version from the PEP header; null when it has none (e.g. process PEPs) */
   version: string | null;
-  /** version was only ever a target (rejected / withdrawn) */
+  /** version was only ever a target (rejected / withdrawn / deferred / superseded) */
   target?: boolean;
   coauthors: string[];
+  /** curated; empty for a PEP that has no entry in `pepNotes` yet */
   description: string;
   /** larger plate */
   featured?: boolean;
+  url: string;
 }
 
 export interface Source {
@@ -133,331 +132,243 @@ export const pepUrl = (n: number) => `https://peps.python.org/pep-${String(n).pa
 
 export const intro = {
   num: "II",
-  title: "The Interpreter",
-  kicker: "import cpython",
-  lede: "I got my commit bit in 2018 and have been poking at the interpreter's guts ever since. This is the paper trail: the offices, the proposals, and the things that shipped.",
+  title: "CPython",
+  kicker: "python/cpython",
+  lede: "I became a CPython core developer in June 2018. This section lists my roles, my PEPs and my changes to each release since 3.8.",
 };
 
 /* ───────────────────────── numbers ───────────────────────── */
 
+const BUILT = new Date();
 const CORE_DEV_SINCE = new Date("2018-06-06");
 const yearsAsCoreDev = Math.floor(
-  (Date.now() - CORE_DEV_SINCE.getTime()) / (365.2425 * 24 * 3600 * 1000),
+  (BUILT.getTime() - CORE_DEV_SINCE.getTime()) / (365.2425 * 24 * 3600 * 1000),
 );
 
+const fetchedAt = new Date(cpythonData.fetchedAt);
+/** The year of the snapshot is still in progress, so its bar is partial. */
+const partialYear = String(fetchedAt.getUTCFullYear());
+const fmt = (n: number) => n.toLocaleString("en-US");
+
 export const stats: Stat[] = [
-  {
-    value: String(yearsAsCoreDev),
-    label: "years as a core developer",
-    note: "commit bit since 6 June 2018",
-  },
-  {
-    value: "6",
-    label: "Steering Council terms",
-    note: "2021 through 2026, in a row",
-  },
-  {
-    value: "2",
-    label: "releases managed",
-    versions: ["3.10", "3.11"],
-  },
-  {
-    value: "15",
-    label: "PEPs written",
-    note: "authored or co-authored",
-  },
-  {
-    value: "1,118",
-    label: "merged pull requests",
-    note: "python/cpython, by year opened",
-    series: [
-      { year: "2017", n: 14 },
-      { year: "2018", n: 62 },
-      { year: "2019", n: 132 },
-      { year: "2020", n: 190 },
-      { year: "2021", n: 259 },
-      { year: "2022", n: 96 },
-      { year: "2023", n: 79 },
-      { year: "2024", n: 67 },
-      { year: "2025", n: 133 },
-      { year: "2026", n: 87 },
-    ],
-  },
-  {
-    value: "#29",
-    label: "all-time contributor",
-    note: "958 commits on main",
-  },
+  { value: String(yearsAsCoreDev), label: "years as a core developer" },
+  { value: fmt(cpythonData.mergedPRs), label: "merged pull requests" },
+  { value: String(pepsData.peps.length), label: "PEPs as author or co-author" },
+  { value: `#${cpythonData.contributorRank}`, label: "all-time contributor rank" },
 ];
 
-export const statsSource = "GitHub, queried 24 September 2026";
+/** Merged pull requests per year (by year opened), for the small bar chart. */
+export const prsByYear: { year: string; n: number; partial?: boolean }[] =
+  cpythonData.mergedPRsByYear.map((d) => ({
+    year: d.year,
+    n: d.count,
+    partial: d.year === partialYear || undefined,
+  }));
 
-/* ───────────────────────── timeline ───────────────────────── */
+export const statsSource = `GitHub, queried ${fetchedAt.toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+})}`;
 
-export const axis = { from: 2017, to: 2027, now: 2026.73 };
+/* ───────────────────────── roles ───────────────────────── */
 
 export const offices: Office[] = [
   {
     role: "Core developer",
-    from: 2018.43,
-    range: "June 2018 to now",
+    range: "2018 to now",
     href: "https://devguide.python.org/core-team/team-log/",
   },
   {
     role: "PSF Fellow",
-    from: 2019.85,
-    range: "2019 to now",
+    range: "2019",
     href: "https://www.python.org/psf/fellows/",
   },
   {
-    role: "Release manager, 3.10",
-    from: 2020.38,
-    range: "2020 to 2026",
-    note: "last security releases",
+    role: "Release manager, 3.10 and 3.11",
+    range: "2020 to now",
     href: pepUrl(619),
   },
   {
-    role: "Release manager, 3.11",
-    from: 2021.34,
-    range: "2021 to now",
-    href: pepUrl(664),
-  },
-  {
-    role: "Faster CPython",
-    from: 2021.34,
-    to: 2022.81,
-    range: "the 3.11 cycle",
-    note: "part-time, funded by Bloomberg",
-    href: "https://docs.python.org/3.11/whatsnew/3.11.html#whatsnew311-faster-cpython-about",
-  },
-  {
-    role: "Steering Council",
-    from: 2021,
-    range: "six terms, 2021 through 2026",
-    segments: 6,
-    accent: true,
+    role: "Steering Council, six terms",
+    range: "2021 to 2026",
     href: "https://peps.python.org/pep-8107/",
-  },
-];
-
-export const milestones: Milestone[] = [
-  {
-    at: 2017.66,
-    date: "28 Aug 2017",
-    title: "First merged pull request",
-    detail: "A fix to the ZeroMQ logging examples. Everyone starts somewhere.",
-    href: "https://github.com/python/cpython/pull/3229",
-  },
-  {
-    at: 2018.43,
-    date: "6 Jun 2018",
-    title: "Commit bit",
-    detail: "Promoted to core developer.",
-    href: "https://devguide.python.org/core-team/team-log/",
-  },
-  {
-    at: 2018.9,
-    date: "2018",
-    title: "PEP 8001",
-    detail: "After Guido stepped down, I co-wrote the process we used to vote on how Python is governed.",
-    href: pepUrl(8001),
-  },
-  {
-    at: 2019.85,
-    date: "Q4 2019",
-    title: "PSF Fellow",
-    href: "https://www.python.org/psf/fellows/",
-  },
-  {
-    at: 2020.3,
-    date: "2020",
-    title: "Language Summit: the PEG parser",
-    href: "https://us.pycon.org/2020/events/languagesummit/",
-  },
-  {
-    at: 2022.3,
-    date: "2022",
-    title: "Language Summit: f-strings in the grammar",
-    href: "https://us.pycon.org/2022/events/language-summit/",
-  },
-  {
-    at: 2024.35,
-    date: "2024",
-    title: "Language Summit: the new REPL",
-    href: "https://us.pycon.org/2024/events/language-summit/",
-  },
-  {
-    at: 2026.38,
-    date: "2026",
-    title: "PyCon US keynote",
-    detail: "“Horizonte de sucesos / Event Horizon”, in Spanish with live English translation.",
-    href: "https://us.pycon.org/2026/about/keynote-speakers/",
   },
 ];
 
 /* ───────────────────────── PEPs ───────────────────────── */
 
-export const peps: Pep[] = [
-  {
-    number: 570,
-    title: "Python Positional-Only Parameters",
-    status: "Final",
-    version: "3.8",
-    coauthors: ["Larry Hastings", "Mario Corchero", "Eric N. Vander Weele"],
-    description: "The `/` in `def f(a, b, /)`. I co-wrote the PEP and implemented it.",
-  },
-  {
-    number: 617,
-    title: "New PEG parser for CPython",
-    status: "Final",
-    version: "3.9",
-    coauthors: ["Guido van Rossum", "Lysandros Nikolaou"],
+/**
+ * Curated text for each PEP, keyed by number. The list itself, the titles,
+ * statuses, versions and co-authors come from `generated/peps.json`. A new PEP
+ * in that file renders without a description until it gets an entry here.
+ */
+const pepNotes: Record<number, { description: string; featured?: boolean }> = {
+  570: {
     description:
-      "Guido, Lysandros and I swapped out CPython's 30-year-old LL(1) parser for a PEG one, which opened the door to new syntax and much better error messages.",
+      "The `/` in `def f(a, b, /)`. I co-wrote the PEP and implemented it.",
+  },
+  617: {
+    description:
+      "Guido, Lysandros and I replaced the old LL(1) parser with a PEG parser.",
     featured: true,
   },
-  {
-    number: 619,
-    title: "Python 3.10 Release Schedule",
-    status: "Active",
-    version: "3.10",
-    coauthors: [],
-    description: "The calendar I ran 3.10 by, from alpha to security-only.",
-  },
-  {
-    number: 657,
-    title: "Include Fine Grained Error Locations in Tracebacks",
-    status: "Final",
-    version: "3.11",
-    coauthors: ["Batuhan Taskaya", "Ammar Askar"],
+  619: {
     description:
-      "Those little `^^^^^` markers in your tracebacks that point at the exact expression that blew up.",
+      "The release schedule I followed for 3.10, from the first alpha to the security-only releases.",
+  },
+  657: {
+    description:
+      "Tracebacks mark the exact expression that failed with `^^^^^`.",
     featured: true,
   },
-  {
-    number: 664,
-    title: "Python 3.11 Release Schedule",
-    status: "Active",
-    version: "3.11",
-    coauthors: [],
-    description: "The same thing again, this time for 3.11.",
-  },
-  {
-    number: 679,
-    title: "New assert statement syntax with parentheses",
-    status: "Rejected",
-    version: "3.15",
-    target: true,
-    coauthors: ["Stan Ulbrych"],
+  664: {
     description:
-      "An attempt to make `assert(x, \"msg\")` do what people expect instead of always passing. The Steering Council said no, which happens.",
+      "The release schedule I followed for 3.11.",
   },
-  {
-    number: 701,
-    title: "Syntactic formalization of f-strings",
-    status: "Final",
-    version: "3.12",
-    coauthors: ["Batuhan Taskaya", "Lysandros Nikolaou", "Marta Gómez Macías"],
+  679: {
     description:
-      "f-strings moved into the real grammar, so you can nest quotes, use backslashes and comments, and get proper error messages inside them.",
+      "A proposal to make `assert(x, \"msg\")` check `x`. Today that line always passes. The Steering Council rejected the PEP.",
+  },
+  701: {
+    description:
+      "f-strings are part of the grammar. You can reuse quotes inside them.",
     featured: true,
   },
-  {
-    number: 758,
-    title: "Allow except and except* expressions without parentheses",
-    status: "Final",
-    version: "3.14",
-    coauthors: ["Brett Cannon"],
-    description: "`except TimeoutError, ConnectionRefusedError:` is valid again, with no brackets needed.",
-  },
-  {
-    number: 760,
-    title: "No More Bare Excepts",
-    status: "Withdrawn",
-    version: "3.14",
-    target: true,
-    coauthors: ["Brett Cannon"],
+  758: {
     description:
-      "Brett and I proposed getting rid of bare `except:`. The community pushed back, and we withdrew it.",
+      "`except TimeoutError, ConnectionRefusedError:` is valid syntax. You do not need the parentheses.",
   },
-  {
-    number: 762,
-    title: "REPL-acing the default REPL",
-    status: "Final",
-    version: "3.13",
-    coauthors: ["Łukasz Langa", "Lysandros Nikolaou", "Emily Morehouse-Valcarcel"],
+  760: {
     description:
-      "Why Python 3.13 ships a new REPL, written in Python, with colors, multiline editing and paste mode.",
+      "Brett and I proposed to remove bare `except:`. Many people disagreed, so we withdrew it.",
   },
-  {
-    number: 768,
-    title: "Safe external debugger interface for CPython",
-    status: "Final",
-    version: "3.14",
-    coauthors: ["Matt Wozniski", "Ivona Stojanovic"],
+  762: {
     description:
-      "A safe, zero-overhead way for debuggers to attach to a running Python process and run code in it. It's what powers `sys.remote_exec` and `python -m pdb -p PID`.",
+      "The reasons for the new REPL in Python 3.13. It is written in Python and has colors, multiline editing and paste mode.",
+  },
+  768: {
+    description:
+      "Debuggers can attach to a running process. `pdb -p PID` uses it.",
     featured: true,
   },
-  {
-    number: 799,
-    title: "A dedicated profiling package for organizing Python profiling tools",
-    status: "Final",
-    version: "3.15",
-    coauthors: ["László Kiss Kollár"],
+  799: {
     description:
-      "A new `profiling` package to hold Python's profilers, including Tachyon, the new sampling profiler.",
+      "A new `profiling` package. It includes Tachyon, a sampling profiler.",
     featured: true,
   },
-  {
-    number: 810,
-    title: "Explicit lazy imports",
-    status: "Final",
-    version: "3.15",
-    coauthors: [
-      "Germán Méndez Bravo",
-      "Thomas Wouters",
-      "Dino Viehland",
-      "Brittany Reynoso",
-      "Noah Kim",
-      "Tim Stumbaugh",
-    ],
+  810: {
     description:
-      "`lazy import json`: the module only loads when you actually use it, so startup gets faster.",
+      "`lazy import json` loads the module only when you first use it.",
     featured: true,
   },
-  {
-    number: 831,
-    title: "Frame Pointers Everywhere: Enabling System-Level Observability for Python",
-    status: "Final",
-    version: "3.15",
-    coauthors: ["Ken Jin", "Savannah Ostrowski", "Diego Russo"],
+  831: {
     description:
-      "CPython now builds with frame pointers by default, so system profilers and debuggers can walk Python's native stacks.",
+      "From 3.15, CPython builds with frame pointers by default. Native profilers and debuggers can then walk Python's native stacks.",
   },
-  {
-    number: 8001,
-    title: "Python Governance Voting Process",
-    status: "Final",
-    version: null,
-    coauthors: [
-      "Brett Cannon",
-      "Christian Heimes",
-      "Donald Stufft",
-      "Eric Snow",
-      "Gregory P. Smith",
-      "Łukasz Langa",
-      "Mariatta",
-      "Nathaniel J. Smith",
-      "Raymond Hettinger",
-      "Tal Einat",
-      "Tim Peters",
-      "Zachary Ware",
-    ],
+  8001: {
     description:
-      "After Guido stepped down in 2018, I co-wrote the process the core team used to vote on how Python would be governed.",
+      "Guido stepped down in 2018. I co-wrote the process that the core team used to vote on a new governance model.",
   },
+};
+
+/** "Pablo Galindo Salgado" and plain "Pablo Galindo", as in scripts/refresh/peps.mjs. */
+const IS_ME = /^Pablo Galindo( Salgado)?$/;
+
+/** No shipped version: the version in the header was only ever a target. */
+const NOT_SHIPPED = new Set(["Rejected", "Withdrawn", "Deferred", "Superseded"]);
+
+export const peps: Pep[] = [...pepsData.peps]
+  .sort((a, b) => a.number - b.number)
+  .map((p) => {
+    const note = pepNotes[p.number];
+    return {
+      number: p.number,
+      // the PEP index uses reST ``literals``; the component renders `code`
+      title: p.title.replace(/``([^`]+)``/g, "`$1`"),
+      status: p.status as PepStatus,
+      type: p.type,
+      version: p.python_version,
+      target: NOT_SHIPPED.has(p.status) || undefined,
+      coauthors: p.authors.filter((a) => !IS_ME.test(a.trim())),
+      description: note?.description ?? "",
+      featured: note?.featured,
+      url: p.url || pepUrl(p.number),
+    };
+  });
+
+/* Status tally and the sentence above the plates, both from the data. */
+
+const STATUS_ORDER: string[] = [
+  "Final",
+  "Active",
+  "Accepted",
+  "Provisional",
+  "Draft",
+  "Deferred",
+  "Rejected",
+  "Withdrawn",
+  "Superseded",
 ];
+
+/** Count per status, in PEP 1 order; statuses with no PEPs are left out. */
+export const pepTally: { n: number; status: string }[] = (() => {
+  const counts = new Map<string, number>();
+  for (const p of peps) counts.set(p.status, (counts.get(p.status) ?? 0) + 1);
+  const rank = (s: string) => (STATUS_ORDER.includes(s) ? STATUS_ORDER.indexOf(s) : STATUS_ORDER.length);
+  return [...counts]
+    .sort((a, b) => rank(a[0]) - rank(b[0]))
+    .map(([status, n]) => ({ n, status }));
+})();
+
+const WORDS = [
+  "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+  "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
+  "eighteen", "nineteen", "twenty",
+];
+const word = (n: number) => WORDS[n] ?? String(n);
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const be = (n: number) => (n === 1 ? "is" : "are");
+const and = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`);
+
+/**
+ * For example: "My name is on 15 PEPs. Eleven are final. Two are the release
+ * schedules for 3.10 and 3.11. One is rejected and one is withdrawn."
+ */
+export const pepSummary: string = (() => {
+  const total = peps.length;
+  const out = [`My name is on ${total} ${total === 1 ? "PEP" : "PEPs"}.`];
+
+  const final = peps.filter((p) => p.status === "Final").length;
+  if (final > 0) out.push(`${cap(word(final))} ${be(final)} final.`);
+
+  const schedules = peps.filter((p) => p.status === "Active" && /release schedule/i.test(p.title));
+  if (schedules.length > 0) {
+    const vs = schedules.map((p) => p.title.match(/\d+\.\d+/)?.[0]).filter((v): v is string => !!v);
+    const n = schedules.length;
+    const what = n === 1 ? "the release schedule" : "the release schedules";
+    out.push(`${cap(word(n))} ${be(n)} ${what}${vs.length ? ` for ${and(vs)}` : ""}.`);
+  }
+
+  const rest = pepTally
+    .filter((t) => t.status !== "Final")
+    .map((t) => ({
+      ...t,
+      n: t.status === "Active" ? t.n - schedules.length : t.n,
+    }))
+    .filter((t) => t.n > 0)
+    .map(({ n, status }) =>
+      status === "Draft"
+        ? n === 1
+          ? "one is a draft"
+          : `${word(n)} are drafts`
+        : `${word(n)} ${be(n)} ${status.toLowerCase()}`,
+    );
+  if (rest.length > 0) out.push(`${cap(and(rest))}.`);
+
+  return out.join(" ");
+})();
 
 /** The version that has not shipped yet (final scheduled for 2026-10-01, PEP 790). */
 export const upcomingVersion = "3.15";
@@ -479,9 +390,9 @@ export const releases: Release[] = [
         ),
       },
       {
-        name: "math.prod and other odds and ends",
+        name: "math.prod and smaller changes",
         description:
-          "I added `math.prod()`, `gc.get_objects(generation=...)`, and helped speed up namedtuple field lookups and class variable writes.",
+          "I added `math.prod()` and `gc.get_objects(generation=...)`. I also helped make namedtuple field lookups and class variable writes faster.",
         sources: sources(
           "https://docs.python.org/3.8/whatsnew/3.8.html",
           "https://bugs.python.org/issue35606",
@@ -492,7 +403,7 @@ export const releases: Release[] = [
         name: "Garbage collector work",
         span: "3.8 to 3.12",
         description:
-          "Years of GC work: `gc.get_objects(generation)` (3.8), handling resurrected objects correctly and `gc.is_finalized` (3.9), GC audit hooks (3.10), and moving GC runs onto the eval breaker instead of object allocations (3.12).",
+          "I worked on the garbage collector from 3.8 to 3.12. 3.8 got `gc.get_objects(generation)`. 3.9 got correct handling of resurrected objects and `gc.is_finalized`. 3.10 got GC audit hooks. In 3.12, GC runs moved from object allocation to the eval breaker.",
         sources: sources(
           "https://docs.python.org/3.9/whatsnew/3.9.html",
           "https://bugs.python.org/issue38379",
@@ -509,7 +420,7 @@ export const releases: Release[] = [
         name: "The PEG parser",
         pep: 617,
         description:
-          "The new PEG-based parser became the default in 3.9, and the old LL(1) parser was deleted in 3.10.",
+          "The new PEG parser became the default in 3.9. We deleted the old LL(1) parser in 3.10.",
         sources: sources(
           "https://docs.python.org/3.9/whatsnew/3.9.html#new-parser",
           "https://bugs.python.org/issue40334",
@@ -518,7 +429,7 @@ export const releases: Release[] = [
       {
         name: "graphlib and ast.unparse",
         description:
-          "I co-created the `graphlib` module (topological sorting) with Tim Peters and Larry Hastings, and `ast.unparse()` with Batuhan Taskaya.",
+          "I wrote the `graphlib` module (topological sorting) with Tim Peters and Larry Hastings. I wrote `ast.unparse()` with Batuhan Taskaya.",
         sources: sources(
           "https://docs.python.org/3.9/whatsnew/3.9.html",
           "https://bugs.python.org/issue17005",
@@ -536,7 +447,7 @@ export const releases: Release[] = [
         name: "Better error messages and “Did you mean” suggestions",
         span: "3.10 onwards",
         description:
-          "I rewrote a large share of SyntaxErrors (\"expected ':'\", \"Perhaps you forgot a comma?\", unclosed brackets) and added \"Did you mean\" suggestions for NameError and AttributeError. I've kept improving them in every release since: import suggestions in 3.12, keyword typo suggestions like \"Did you mean 'while'?\" in 3.14.",
+          "In 3.10 I rewrote many SyntaxErrors, for example \"expected ':'\", \"Perhaps you forgot a comma?\" and unclosed brackets. I also added \"Did you mean\" suggestions for NameError and AttributeError. I improve them in every release. 3.12 added import suggestions. 3.14 added keyword typo suggestions like \"Did you mean 'while'?\".",
         sources: sources(
           "https://docs.python.org/3.10/whatsnew/3.10.html#better-error-messages",
           "https://docs.python.org/3.12/whatsnew/3.12.html",
@@ -547,7 +458,7 @@ export const releases: Release[] = [
       {
         name: "Parenthesized context managers",
         description:
-          "Multi-line `with (a() as x, b() as y):` became officially supported, thanks to the new parser.",
+          "With the new parser, multi-line `with (a() as x, b() as y):` became official syntax.",
         sources: sources(
           "https://docs.python.org/3.10/whatsnew/3.10.html",
           "https://bugs.python.org/issue12782",
@@ -556,46 +467,13 @@ export const releases: Release[] = [
       {
         name: "LOAD_ATTR opcode cache",
         description:
-          "A per-opcode cache that made attribute access about 36% faster (44% for slots). I built it with Yury Selivanov.",
+          "Yury Selivanov and I added a per-opcode cache. It made attribute access about 36% faster (44% for slots).",
         sources: sources(
           "https://docs.python.org/3.10/whatsnew/3.10.html",
           "https://bugs.python.org/issue42093",
         ),
       },
     ],
-    demo: {
-      title: "Error messages that know what went wrong",
-      caption: "Same file, one release apart.",
-      panes: [
-        {
-          label: "python3.9",
-          before: true,
-          lines: [
-            { k: "cmd", t: "python3.9 orbits.py" },
-            { k: "out", t: '  File "/tmp/orbits.py", line 4' },
-            { k: "src", t: "    print(orbits)" },
-            { k: "caret", t: "    ^" },
-            { k: "err", t: "SyntaxError: invalid syntax" },
-          ],
-        },
-        {
-          label: "python3.10",
-          lines: [
-            { k: "cmd", t: "python3.10 orbits.py" },
-            { k: "out", t: '  File "/tmp/orbits.py", line 1' },
-            { k: "src", t: '    orbits = {"mercury": 88, "venus": 225,' },
-            { k: "caret", t: "             ^" },
-            { k: "err", t: "SyntaxError: '{' was never closed" },
-            { k: "blank" },
-            { k: "cmd", t: "python3.10 typo.py" },
-            { k: "out", t: "Traceback (most recent call last):" },
-            { k: "out", t: '  File "/tmp/typo.py", line 2, in <module>' },
-            { k: "src", t: "    pint(math.tau)" },
-            { k: "err", t: "NameError: name 'pint' is not defined. Did you mean: 'print'?" },
-          ],
-        },
-      ],
-    },
   },
   {
     version: "3.11",
@@ -605,7 +483,7 @@ export const releases: Release[] = [
       {
         name: "Fine-grained error locations in tracebacks",
         pep: 657,
-        description: "Tracebacks now underline the exact expression that failed, not just the line.",
+        description: "Tracebacks underline the exact expression that failed. Before 3.11, they showed only the line.",
         sources: sources(
           "https://docs.python.org/3.11/whatsnew/3.11.html#whatsnew311-pep657",
           "https://bugs.python.org/issue43950",
@@ -614,7 +492,7 @@ export const releases: Release[] = [
       {
         name: "Inlined Python-to-Python calls",
         description:
-          "With Mark Shannon I made Python function calls stop consuming C stack, which gave about a 1.7x speedup on simple recursive code.",
+          "Mark Shannon and I made Python-to-Python calls stop using the C stack. Simple recursive code became about 1.7x faster.",
         sources: sources(
           "https://docs.python.org/3.11/whatsnew/3.11.html",
           "https://bugs.python.org/issue45256",
@@ -622,8 +500,8 @@ export const releases: Release[] = [
       },
     ],
     demo: {
-      title: "Which one was None?",
-      caption: "The tildes cover the operands, the carets the operator that failed.",
+      title: "Carets under the failing expression",
+      caption: "The tildes mark the operands. The carets mark the operator that failed.",
       panes: [
         {
           label: "python3.11",
@@ -649,7 +527,7 @@ export const releases: Release[] = [
         name: "f-strings in the grammar",
         pep: 701,
         description:
-          "f-strings got a proper grammar, and the tokenize module became up to 64% faster along the way.",
+          "f-strings are now part of the grammar. The tokenize module also became up to 64% faster.",
         sources: sources(
           "https://docs.python.org/3.12/whatsnew/3.12.html#whatsnew312-pep701",
           "https://github.com/python/cpython/issues/102856",
@@ -658,7 +536,7 @@ export const releases: Release[] = [
       {
         name: "Linux perf profiler support",
         description:
-          "I designed and built support for `perf` (`-X perf`) so Python function names show up in native profiles. 3.13 added `-X perf_jit`, which works without frame pointers.",
+          "I designed and wrote support for the Linux `perf` profiler (`-X perf`). With it, Python function names show up in native profiles. 3.13 added `-X perf_jit`, which works without frame pointers.",
         sources: sources(
           "https://docs.python.org/3/howto/perf_profiling.html",
           "https://github.com/python/cpython/issues/96123",
@@ -674,20 +552,6 @@ export const releases: Release[] = [
         ),
       },
     ],
-    demo: {
-      title: "Quotes inside quotes",
-      caption: "Reusing the same quote inside the braces was a SyntaxError before 3.12.",
-      panes: [
-        {
-          label: "python3.12",
-          lines: [
-            { k: "prompt", t: 'songs = ["Take me back to Eden", "Alkaline", "Ascensionism"]' },
-            { k: "prompt", t: 'f"This is the playlist: {", ".join(songs)}"' },
-            { k: "out", t: "'This is the playlist: Take me back to Eden, Alkaline, Ascensionism'" },
-          ],
-        },
-      ],
-    },
   },
   {
     version: "3.13",
@@ -697,7 +561,7 @@ export const releases: Release[] = [
         name: "A new interactive REPL, and colored tracebacks",
         pep: 762,
         description:
-          "Łukasz, Lysandros and I built the new default REPL (based on PyPy's), and I made tracebacks colored by default.",
+          "Łukasz, Lysandros and I built the new default REPL, based on the PyPy REPL. I also made tracebacks colored by default.",
         sources: sources(
           "https://docs.python.org/3.13/whatsnew/3.13.html#whatsnew313-better-interactive-interpreter",
           "https://github.com/python/cpython/issues/111201",
@@ -706,7 +570,7 @@ export const releases: Release[] = [
       },
       {
         name: "PyRefTracer C API",
-        description: "C API hooks for tracking object creation and destruction, useful for memory profilers.",
+        description: "New C API hooks that report when objects are created and destroyed. Memory profilers can use them.",
         sources: sources(
           "https://docs.python.org/3.13/whatsnew/3.13.html",
           "https://github.com/python/cpython/issues/93502",
@@ -731,7 +595,7 @@ export const releases: Release[] = [
       {
         name: "asyncio introspection: python -m asyncio ps and pstree",
         description:
-          "Point it at a running process and see which tasks are waiting on which. Also added `asyncio.capture_call_graph()` and `print_call_graph()`.",
+          "Run them against a running process to see which tasks wait on which. I also added `asyncio.capture_call_graph()` and `print_call_graph()`.",
         sources: sources(
           "https://docs.python.org/3.14/whatsnew/3.14.html#whatsnew314-asyncio-introspection",
           "https://github.com/python/cpython/issues/91048",
@@ -739,7 +603,7 @@ export const releases: Release[] = [
       },
       {
         name: "Template strings",
-        description: "One of the team that implemented t-strings (PEP 750), mainly on the parser side.",
+        description: "I was one of the people who implemented t-strings (PEP 750). I worked mainly on the parser.",
         sources: sources(
           "https://docs.python.org/3.14/whatsnew/3.14.html#whatsnew314-template-string-literals",
           "https://github.com/python/cpython/issues/132661",
@@ -748,7 +612,7 @@ export const releases: Release[] = [
       {
         name: "Bracketless except",
         pep: 758,
-        description: "`except A, B:` without parentheses.",
+        description: "You can write `except A, B:` without parentheses.",
         sources: sources(
           "https://docs.python.org/3.14/whatsnew/3.14.html#whatsnew314-bracketless-except",
           "https://github.com/python/cpython/issues/131831",
@@ -758,14 +622,14 @@ export const releases: Release[] = [
   },
   {
     version: "3.15",
-    when: "due 1 Oct 2026",
+    when: "final due 1 Oct 2026",
     upcoming: true,
     features: [
       {
         name: "Tachyon and the profiling package",
         pep: 799,
         description:
-          "Tachyon (`profiling.sampling`) is a high-frequency statistical profiler that can attach to running processes, and `cProfile` finds a new home as `profiling.tracing`. Built with László Kiss Kollár.",
+          "Tachyon (`profiling.sampling`) is a high-frequency sampling profiler. It can attach to running processes. `cProfile` moves to `profiling.tracing`. László Kiss Kollár and I built Tachyon.",
         sources: sources(
           "https://docs.python.org/3.15/whatsnew/3.15.html#whatsnew315-sampling-profiler",
           "https://docs.python.org/3.15/library/profiling.sampling.html",
@@ -775,7 +639,7 @@ export const releases: Release[] = [
       {
         name: "Explicit lazy imports",
         pep: 810,
-        description: "The `lazy import` statement, implemented with Dino Viehland.",
+        description: "The new `lazy import` statement. Dino Viehland and I implemented it.",
         sources: sources(
           "https://docs.python.org/3.15/whatsnew/3.15.html#whatsnew315-lazy-imports",
           "https://github.com/python/cpython/issues/142349",
@@ -785,7 +649,7 @@ export const releases: Release[] = [
         name: "Frame pointers by default",
         pep: 831,
         description:
-          "CPython builds with frame pointers by default, so native profilers and debuggers can see through Python.",
+          "CPython builds with frame pointers by default. Native profilers and debuggers can then walk through Python frames.",
         sources: sources(
           "https://docs.python.org/3.15/whatsnew/3.15.html#whatsnew315-frame-pointers",
           "https://github.com/python/cpython/issues/149201",
@@ -794,7 +658,7 @@ export const releases: Release[] = [
       {
         name: "JIT unwind info for GDB and backtrace",
         description:
-          "Native debuggers can unwind through JIT-compiled frames instead of stopping at generated code. Done with Diego Russo.",
+          "Native debuggers can unwind through JIT-compiled frames. Before, they stopped at the generated code. Diego Russo and I did this work.",
         sources: sources(
           "https://docs.python.org/3.15/whatsnew/3.15.html#whatsnew315-jit",
           "https://github.com/python/cpython/issues/146071",

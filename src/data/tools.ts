@@ -1,9 +1,13 @@
 /**
- * § III Instruments: the tools section.
+ * § III Tools.
  *
- * Star counts are a snapshot from the GitHub API (see `starsFetched`).
- * Every description here was checked against the project's README or docs.
+ * Star counts come from `generated/github.json`, refreshed daily by a GitHub
+ * Action (see `starsFetched`). The `stars` written below are only fallbacks,
+ * used when a repo is missing from that snapshot. Descriptions are curated by
+ * hand and checked against each project's README or docs.
  */
+
+import github from "./generated/github.json";
 
 export type ToolVisual = "flame" | "stack" | "sampling" | "budget" | "tree";
 
@@ -14,27 +18,24 @@ export interface ToolLink {
 
 export interface FeaturedTool {
   id: string;
-  /** Plate numeral, printed as "Pl. I" */
-  plate: string;
   name: string;
-  /** Secondary name shown in mono under the title, e.g. the module path */
+  /** Secondary name shown in mono next to the title, e.g. the module path */
   alias?: string;
-  /** Short mono margin note: my role on the project */
+  /** One short label: my role on the project */
   role: string;
-  tagline: string;
+  /** One or two short sentences */
   description: string;
-  /** Wrap code in `backticks` to render it in mono */
-  features: string[];
-  /** Shell commands, rendered with a `$` prompt each */
-  commands: string[];
+  /** One example shell command, rendered with a `$` prompt */
+  command: string;
+  /** "owner/name" on GitHub; live stars are looked up by this key */
+  repo?: string;
   stars?: number;
   /** Shown in place of stars when the tool has no repo of its own */
   badge?: string;
   language: string;
   links: ToolLink[];
+  /** Which pixel sprite to draw */
   visual: ToolVisual;
-  /** Figure caption, printed like an engraving plate caption */
-  caption: string;
 }
 
 export interface Experiment {
@@ -43,38 +44,41 @@ export interface Experiment {
   /** Wrap code in `backticks` to render it in mono */
   description: string;
   language: string;
+  /** "owner/name" on GitHub; live stars are looked up by this key */
+  repo: string;
   stars: number;
 }
 
-export const starsFetched = "2026-09-24";
+/** How many experiments show before the "show all" toggle */
+export const experimentsVisible = 8;
+
+/** Snapshot repos, keyed by "owner/name". */
+const liveRepos: Record<string, { stars: number } | undefined> = github.repos;
+
+/** Live star count for `repo`, or `fallback` if the snapshot lacks it. */
+const liveStars = (repo: string, fallback: number): number =>
+  liveRepos[repo]?.stars ?? fallback;
+
+/** Date of the star snapshot, as YYYY-MM-DD */
+export const starsFetched: string = github.fetchedAt?.slice(0, 10) ?? "2026-09-24";
 
 export const toolsIntro = {
   num: "III",
-  title: "Instruments",
-  kicker: "$ ls ~/forbidden-magic",
+  title: "Tools",
+  kicker: "profilers and debuggers",
   lede:
-    "I build tools that look inside running Python processes: the memory they allocate, the stacks they run, and the native frames underneath. The README calls it forbidden magic. Mostly it is reading memory very carefully.",
+    "I build tools that inspect running Python processes. They read the memory, the call stacks and the native frames of the process.",
 };
 
-export const featured: FeaturedTool[] = [
+const featuredFallback: FeaturedTool[] = [
   {
     id: "memray",
-    plate: "I",
     name: "Memray",
-    role: "Co-creator & maintainer · with Matt Wozniski at Bloomberg",
-    tagline: "A memory profiler for Python",
+    role: "Co-creator, with Matt Wozniski at Bloomberg",
     description:
-      "Tracks every allocation in Python code, in native extension modules and in the interpreter itself. When a process eats all the RAM, Memray tells you exactly who ordered it.",
-    features: [
-      "Traces every call instead of sampling, so the call stacks are exact",
-      "Follows native C, C++ and Rust frames, so the whole stack shows up",
-      "Flame graphs, tables, trees, a live TUI, and attaching to running processes",
-    ],
-    commands: [
-      "memray run my_script.py",
-      "memray flamegraph memray-my_script.py.2369.bin",
-      "memray run --live my_script.py",
-    ],
+      "A memory profiler for Python. It tracks every allocation in Python code, in native extension modules and in the interpreter.",
+    command: "memray run my_script.py",
+    repo: "bloomberg/memray",
     stars: 15241,
     language: "Python · C++",
     links: [
@@ -82,27 +86,16 @@ export const featured: FeaturedTool[] = [
       { label: "Docs", href: "https://bloomberg.github.io/memray/" },
     ],
     visual: "flame",
-    caption: "Allocations by call stack. The widest path is where the memory went.",
   },
   {
     id: "tachyon",
-    plate: "II",
     name: "Tachyon",
     alias: "profiling.sampling",
-    role: "Co-author · with László Kiss Kollár · PEP 799",
-    tagline: "The sampling profiler in Python 3.15's standard library",
+    role: "Co-author, PEP 799",
     description:
-      "A statistical profiler that reads the call stack straight out of a process's memory. Attach to a live server by PID, collect samples, and detach without the application ever knowing it was observed.",
-    features: [
-      "Wall-clock, CPU, GIL and exception modes, with async-aware stacks",
-      "Flame graphs, differential flame graphs, line heatmaps, pstats and Firefox Profiler output",
-      "A live TUI, plus a binary format you record now and replay later",
-    ],
-    commands: [
-      "python -m profiling.sampling run --flamegraph -o profile.html script.py",
-      "python -m profiling.sampling attach --live 12345",
-    ],
-    badge: "stdlib · 3.15",
+      "The sampling profiler in the Python 3.15 standard library. It reads the call stack from the memory of a running process.",
+    command: "python -m profiling.sampling attach --live 12345",
+    badge: "stdlib 3.15",
     language: "Python · C",
     links: [
       { label: "Docs", href: "https://docs.python.org/3.15/library/profiling.sampling.html" },
@@ -110,22 +103,15 @@ export const featured: FeaturedTool[] = [
       { label: "Source", href: "https://github.com/python/cpython/tree/main/Lib/profiling/sampling" },
     ],
     visual: "sampling",
-    caption: "One stack read per tick. Enough ticks and the hot path draws itself.",
   },
   {
     id: "pystack",
-    plate: "III",
     name: "PyStack",
-    role: "Co-creator & maintainer · with Matt Wozniski at Bloomberg",
-    tagline: "Like pstack, but for Python",
+    role: "Co-creator, with Matt Wozniski at Bloomberg",
     description:
-      "Prints the stack of a running Python process or a core dump, so you can see what it is doing, or what it was doing when it died, without decoding CPython internals by hand.",
-    features: [
-      "Live processes and core files, with Python and native frames interleaved",
-      "Shows who holds the GIL, who is collecting garbage, and local variables",
-      "Never writes to the target; reads core files about 10x faster than GDB",
-    ],
-    commands: ["pystack remote 12345", "pystack remote 12345 --native --locals", "pystack core ./core.12345"],
+      "Prints the stack of a running Python process or a core dump. It shows the Python frames and the native frames together.",
+    command: "pystack remote 12345",
+    repo: "bloomberg/pystack",
     stars: 1218,
     language: "C++ · Python",
     links: [
@@ -133,22 +119,15 @@ export const featured: FeaturedTool[] = [
       { label: "Docs", href: "https://bloomberg.github.io/pystack" },
     ],
     visual: "stack",
-    caption: "Python and C frames, one stack, top to bottom.",
   },
   {
     id: "pytest-memray",
-    plate: "IV",
     name: "pytest-memray",
     role: "Maintainer",
-    tagline: "Memray, as a pytest plugin",
     description:
-      "Add one flag and the test suite reports who allocated what. Give a test a memory budget and it fails when it goes over, or when it leaks.",
-    features: [
-      "`--memray` prints a per-test allocation report",
-      "`@pytest.mark.limit_memory(\"24 MB\")` enforces a budget",
-      "`@pytest.mark.limit_leaks(\"1 MB\")` catches leaks",
-    ],
-    commands: ["pytest --memray tests/", "pytest --memray --most-allocations=10 tests/"],
+      "A pytest plugin for Memray. It reports the allocations of each test and fails a test that goes over its memory limit.",
+    command: "pytest --memray tests/",
+    repo: "bloomberg/pytest-memray",
     stars: 424,
     language: "Python",
     links: [
@@ -156,22 +135,15 @@ export const featured: FeaturedTool[] = [
       { label: "Docs", href: "https://pytest-memray.readthedocs.io/en/latest/" },
     ],
     visual: "budget",
-    caption: "Three tests, one budget, one failure.",
   },
   {
     id: "pegen",
-    plate: "V",
     name: "pegen",
-    role: "Co-author · PEP 617",
-    tagline: "The parser generator behind CPython",
+    role: "Co-author, PEP 617",
     description:
-      "CPython builds its own parser from a PEG grammar with pegen. This is the standalone version, so you can point it at grammars of your own.",
-    features: [
-      "PEG grammars in, Python parsers out",
-      "Left-recursive rules and memoization",
-      "Ships example grammars, including one for Python",
-    ],
-    commands: ["python -m pegen my_grammar.gram -o parser.py", "python parser.py input.txt"],
+      "The PEG parser generator that builds the CPython parser. This standalone version works with your own grammars.",
+    command: "python -m pegen my_grammar.gram -o parser.py",
+    repo: "we-like-parsers/pegen",
     stars: 202,
     language: "Python",
     links: [
@@ -179,115 +151,136 @@ export const featured: FeaturedTool[] = [
       { label: "Docs", href: "https://we-like-parsers.github.io/pegen/" },
     ],
     visual: "tree",
-    caption: "expr: expr '+' term | term, and the tree it grows.",
   },
 ];
 
-export const experiments: Experiment[] = [
+const experimentsFallback: Experiment[] = [
   {
     name: "python-horror-show",
     href: "https://github.com/pablogsal/python-horror-show",
-    description: "Strange Python snippets, explained. Meant to mess with your head; may teach you how Python works.",
+    repo: "pablogsal/python-horror-show",
+    description: "Strange Python snippets, with an explanation of how each one works.",
     language: "Python",
     stars: 368,
   },
   {
-    name: "memory.python.org",
-    href: "https://github.com/python/memory.python.org",
-    description: "Memory benchmarking for CPython development, tracked across commits and build configurations.",
-    language: "Python",
-    stars: 19,
-  },
-  {
     name: "slowlify",
     href: "https://github.com/pablogsal/slowlify",
-    description: "Turns a fast laptop into an overloaded CI runner, to reproduce the failures that only happen there.",
+    repo: "pablogsal/slowlify",
+    description: "Makes a fast laptop behave like an overloaded CI runner, to reproduce failures that only happen in CI.",
     language: "Shell",
     stars: 25,
   },
   {
+    name: "memory.python.org",
+    href: "https://github.com/python/memory.python.org",
+    repo: "python/memory.python.org",
+    description: "Memory benchmarks for CPython, tracked across commits and build configurations.",
+    language: "Python",
+    stars: 19,
+  },
+  {
     name: "stackpulse",
     href: "https://github.com/pablogsal/stackpulse",
-    description: "A Rust library for building Linux profilers on perf_event, resolving native, Python, JIT and kernel frames.",
+    repo: "pablogsal/stackpulse",
+    description: "A Rust library for Linux profilers on perf_event. It resolves native, Python, JIT and kernel frames.",
     language: "Rust",
     stars: 6,
   },
   {
+    name: "cpython-unwind",
+    href: "https://github.com/pablogsal/cpython-unwind",
+    repo: "pablogsal/cpython-unwind",
+    description: "Unwinds the native stack with GNU backtrace, libunwind and libdw, so you can compare them.",
+    language: "C",
+    stars: 6,
+  },
+  {
+    name: "gdb-emoji",
+    href: "https://github.com/pablogsal/gdb-emoji",
+    repo: "pablogsal/gdb-emoji",
+    description: "Shows pointers as emoji in GDB, so you can tell them apart.",
+    language: "Python",
+    stars: 5,
+  },
+  {
+    name: "ghost_unwind",
+    href: "https://github.com/pablogsal/ghost_unwind",
+    repo: "pablogsal/ghost_unwind",
+    description: "Shadow-stack unwinding. It is a drop-in replacement for `unw_backtrace()`.",
+    language: "C++",
+    stars: 3,
+  },
+  {
     name: "gsym-rs",
     href: "https://github.com/pablogsal/gsym-rs",
-    description: "Pure-Rust reader, writer and ELF/DWARF converter for LLVM's GSYM symbolization format.",
+    repo: "pablogsal/gsym-rs",
+    description: "A Rust reader, writer and ELF/DWARF converter for the LLVM GSYM symbol format.",
     language: "Rust",
     stars: 2,
   },
   {
     name: "libunwinder",
     href: "https://github.com/pablogsal/libunwinder",
-    description: "Answers \"who called me?\" for profilers, on top of a vendored libunwind.",
+    repo: "pablogsal/libunwinder",
+    description: "A native stack unwinder for profilers, built on a vendored libunwind.",
     language: "Rust",
     stars: 1,
   },
   {
-    name: "ghost_unwind",
-    href: "https://github.com/pablogsal/ghost_unwind",
-    description: "GhostStack: shadow-stack unwinding as a drop-in replacement for `unw_backtrace()`.",
-    language: "C++",
-    stars: 3,
-  },
-  {
-    name: "cpython-unwind",
-    href: "https://github.com/pablogsal/cpython-unwind",
-    description: "Unwinds the native stack three ways (GNU backtrace, libunwind, libdw) so you can compare them.",
-    language: "C",
-    stars: 6,
+    name: "symbol_renamer",
+    href: "https://github.com/pablogsal/symbol_renamer",
+    repo: "pablogsal/symbol_renamer",
+    description: "Renames dynamic symbols in extension modules and their shared libraries to fix symbol clashes.",
+    language: "Python",
+    stars: 1,
   },
   {
     name: "hexforge",
     href: "https://github.com/pablogsal/hexforge",
-    description: "patchelf reimplemented as a compiler pass: lift the ELF into a typed IR, validate, transform, validate again.",
+    repo: "pablogsal/hexforge",
+    description: "patchelf, rewritten as a compiler pass. It lifts the ELF file into a typed IR, then checks and changes it.",
     language: "Rust",
     stars: 0,
   },
   {
     name: "unrepair",
     href: "https://github.com/pablogsal/unrepair",
-    description: "For when `auditwheel repair` is a little too helpful. Points an extension back at the system library.",
+    repo: "pablogsal/unrepair",
+    description: "Undoes part of `auditwheel repair`. It points an extension module back at the system library.",
     language: "Rust",
     stars: 0,
   },
   {
-    name: "symbol_renamer",
-    href: "https://github.com/pablogsal/symbol_renamer",
-    description: "Renames dynamic symbols in extension modules and their shared libraries to settle symbol clashes.",
-    language: "Python",
-    stars: 1,
-  },
-  {
     name: "fenix",
     href: "https://github.com/pablogsal/fenix",
-    description: "Writes debugger-friendly core dumps when your code dies of an uncaught exception. No overhead until then.",
+    repo: "pablogsal/fenix",
+    description: "Writes a core dump for the debugger when a program stops on an uncaught exception. It has no cost until then.",
     language: "Python",
     stars: 0,
   },
   {
-    name: "gdb-emoji",
-    href: "https://github.com/pablogsal/gdb-emoji",
-    description: "Shows your pointers as emojis in GDB. 0x7ffd5e8c is hard to remember; a cat is not.",
-    language: "Python",
-    stars: 5,
-  },
-  {
     name: "ShadowEngine",
     href: "https://github.com/pablogsal/ShadowEngine",
-    description: "A raytracer for the Kerr spacetime, in CUDA: what light does around a spinning black hole.",
+    repo: "pablogsal/ShadowEngine",
+    description: "A CUDA raytracer for the Kerr spacetime. It shows how light moves around a spinning black hole.",
     language: "CUDA",
     stars: 0,
   },
 ];
 
+export const featured: FeaturedTool[] = featuredFallback.map((t) =>
+  t.repo ? { ...t, stars: liveStars(t.repo, t.stars ?? 0) } : t,
+);
+
+export const experiments: Experiment[] = experimentsFallback.map((e) => ({
+  ...e,
+  stars: liveStars(e.repo, e.stars),
+}));
+
 export const toolsProfile = {
   github: "https://github.com/pablogsal",
   handle: "pablogsal",
-  bio: "I hate symbols but I love linkers.",
 };
 
 /** 15241 -> "15.2k", 424 -> "424" */

@@ -1,0 +1,62 @@
+/* Self-hosted fonts, subset to ASCII + Latin-1 + the symbols the site uses
+ * (Jacquard 24: ASCII only, it renders only titles). The "-latin1" and "-ext"
+ * files (Latin Extended, more punctuation, arrows) download only when a page
+ * uses one of their characters (unicode-range). TrueType hinting is kept on
+ * purpose: without it the pixel fonts render differently on Linux/Windows.
+ * The main files are preloaded in src/layouts/Base.astro. */
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono.woff2") format("woff2");
+  unicode-range: U+20-7E, U+A0-FF, U+107, U+10D, U+141-142, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+20AC, U+2122, U+2190-2193, U+2197-2198, U+25A0;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono-ext.woff2") format("woff2");
+  unicode-range: U+100-106, U+108-10C, U+10E-131, U+134-140, U+143-17F, U+18F, U+192, U+1A0-1A1, U+1AF-1B0, U+1CD-1CE, U+1E6-1E7, U+1EA-1EB, U+1F4-1F5, U+1FC-1FF, U+218-21B, U+232-233, U+237, U+1E80-1E85, U+1E9E, U+1EA0-1EF9, U+2010, U+2020-2021, U+2024, U+2030, U+2039-203A, U+2044, U+20AB, U+20AE, U+20BD, U+20BF, U+2113, U+2115-2116, U+212E, U+2194-2196, U+2199, U+21E7, U+2500-259F, U+25A1, U+25AA-25AB, U+25B2-25C7, U+25CA, U+25CC, U+25CE-25CF, U+25D4-25D5, U+25E7-25EB, U+25EF;
+}
+@font-face {
+  font-family: "Jacquard 24";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/jacquard-24.woff2") format("woff2");
+  unicode-range: U+20-7E;
+}
+@font-face {
+  font-family: "Jacquard 24";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/jacquard-24-latin1.woff2") format("woff2");
+  unicode-range: U+A0-A3, U+A5, U+A7-AB, U+AE-B0, U+B4, U+B6-B8, U+BA-BB, U+BF-FF, U+107, U+10D, U+141-142, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+20AC, U+2122;
+}
+@font-face {
+  font-family: "Jacquard 24";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/jacquard-24-ext.woff2") format("woff2");
+  unicode-range: U+100-106, U+10A-10C, U+10E-113, U+116-11B, U+11E-123, U+126-127, U+12A-12B, U+12E-133, U+136-137, U+139-13E, U+143-148, U+14A-14D, U+150-15B, U+15E-161, U+164-165, U+16A-17E, U+218-21B, U+237, U+1E80-1E85, U+1E9E, U+1EF2-1EF3, U+200A, U+2039-203A;
+}
+@font-face {
+  font-family: "Silkscreen";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/silkscreen.woff2") format("woff2");
+  unicode-range: U+20-7E, U+A0-FF, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+20AC, U+2122;
+}
+@font-face {
+  font-family: "Silkscreen";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/silkscreen-ext.woff2") format("woff2");
+  unicode-range: U+152-153, U+160-161, U+178, U+17D-17E, U+192, U+2020-2021, U+2030, U+2039-203A;
+}

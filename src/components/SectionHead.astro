@@ -28,7 +28,7 @@ const { num, title, kicker, lede } = Astro.props;
     gap: var(--space-4);
     margin-bottom: var(--space-7);
     padding-top: var(--space-5);
-    border-top: 1px solid var(--line);
+    border-top: 2px solid var(--line);
   }
   .meta {
     display: flex;
@@ -38,18 +38,15 @@ const { num, title, kicker, lede } = Astro.props;
   }
   .num {
     color: var(--ember);
+    font-family: var(--f-pixel);
     font-size: var(--step--1);
-    letter-spacing: 0.1em;
   }
   .title {
-    font-size: var(--step-4);
-    line-height: 0.95;
+    font-size: calc(var(--step-4) * 1.25);
+    line-height: 0.9;
   }
   .lede {
-    max-width: 38rem;
-    font-size: var(--step-1);
-    font-style: italic;
+    max-width: 40rem;
     color: var(--ash);
-    line-height: 1.4;
   }
 </style>

@@ -1,12 +1,15 @@
 name: Deploy to GitHub Pages
 
 on:
-  # Trigger the workflow every time you push to the `main` branch
-  # Using a different branch name? Replace `main` with your branch’s name
+  # Every push to main deploys the site.
   push:
     branches: [ main ]
-  # Allows you to run this workflow manually from the Actions tab on GitHub.
+  # Manual runs, and runs started by the "Refresh data snapshots" workflow.
   workflow_dispatch:
+  # A weekly rebuild keeps values computed at build time (like years as a
+  # core developer) current, even when no data changed.
+  schedule:
+    - cron: "0 6 * * 1"
 
 # Allow this job to clone the repo and create a page deployment
 permissions:
@@ -14,18 +17,21 @@ permissions:
   pages: write
   id-token: write
 
+# One deployment at a time. Do not cancel a deployment that is in progress.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout your repository using git
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install, build, and upload your site
-        uses: withastro/action@v3
-        # with:
-          # path: . # The root location of your Astro project inside the repository. (optional)
-          # node-version: 20 # The specific version of Node that should be used to build your site. Defaults to 20. (optional)
-          # package-manager: pnpm@latest # The Node package manager that should be used to install dependencies and build your site. Automatically detected based on your lockfile. (optional)
+        uses: withastro/action@v6
+        with:
+          node-version: 22
 
   deploy:
     needs: build
@@ -36,4 +42,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

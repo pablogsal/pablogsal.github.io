@@ -1,4 +1,1112 @@
 ---
-// STUB: to be replaced
+/**
+ * § V Talks. Main block: selected keynotes as pixelated video plates that
+ * play in place. Secondary list: every talk, grouped by year, with kind and
+ * language filters and a "show all" fold. The single decorative element is
+ * the pixel tally (one square per talk). Data lives in src/data/talks.ts.
+ *
+ * Progressive enhancement: without JS every talk is listed, every video is a
+ * normal link to YouTube, and the filter controls stay hidden.
+ */
+import SectionHead from "./SectionHead.astro";
+import {
+  talks,
+  featuredIds,
+  languageNames,
+  kindGroup,
+  youtubeUrl,
+  thumbUrl,
+  type Talk,
+  type KindGroup,
+  type TalkLanguage,
+} from "../data/talks";
+
+/* ───────── numbers ───────── */
+const total = talks.length;
+const years = [...new Set(talks.map((t) => t.year))].sort((a, b) => b - a);
+const firstYear = Math.min(...years);
+const lastYear = Math.max(...years);
+
+const langCounts = new Map<TalkLanguage, number>();
+for (const t of talks) langCounts.set(t.language, (langCounts.get(t.language) ?? 0) + 1);
+const langs = [...langCounts.keys()].sort((a, b) => langCounts.get(b)! - langCounts.get(a)!);
+const langWords = langs.map((l) => languageNames[l]);
+const langList =
+  langWords.length > 1
+    ? `${langWords.slice(0, -1).join(", ")} and ${langWords.at(-1)}`
+    : langWords[0];
+
+const lede = `I have given ${total} talks since ${firstYear}, in ${langList}. Most of them are about CPython internals.`;
+
+/* ───────── pixel tally: one square per talk ───────── */
+const SQ = 3; // square size, in SVG pixels
+const PITCH_Y = 4; // square + 1px gap
+const PITCH_X = 5; // square + 2px gap
+const tallyYears = Array.from({ length: lastYear - firstYear + 1 }, (_, i) => firstYear + i);
+const tallyCols = tallyYears.map((y) => {
+  const list = talks.filter((t) => t.year === y);
+  const keynotes = list.filter((t) => t.kind === "keynote").length;
+  return { y, n: list.length, keynotes };
+});
+const tallyMax = Math.max(...tallyCols.map((c) => c.n));
+const tallyW = tallyYears.length * PITCH_X - (PITCH_X - SQ);
+const tallyH = tallyMax * PITCH_Y - (PITCH_Y - SQ);
+const tallySquares = tallyCols.flatMap((c, i) =>
+  Array.from({ length: c.n }, (_, k) => ({
+    x: i * PITCH_X,
+    y: tallyH - SQ - k * PITCH_Y,
+    keynote: k < c.keynotes,
+  })),
+);
+const keynoteTotal = talks.filter((t) => t.kind === "keynote").length;
+const tallyLabel =
+  `Talks per year: ${tallyCols.map((c) => `${c.y}, ${c.n}`).join("; ")}. ` +
+  `${keynoteTotal} of the ${total} are keynotes, drawn in red.`;
+
+/* ───────── featured keynotes ───────── */
+const featured = featuredIds
+  .map((id) => talks.find((t) => t.youtubeId === id))
+  .filter((t): t is Talk => Boolean(t));
+const [lead, ...strip] = featured;
+
+/* ───────── filters ───────── */
+const kindFilters: { value: "all" | KindGroup; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "keynote", label: "Keynotes" },
+  { value: "talk", label: "Talks" },
+  { value: "panel", label: "Panels" },
+  { value: "summit", label: "Summits" },
+];
+const langFilters: { value: "all" | TalkLanguage; label: string }[] = [
+  { value: "all", label: "All" },
+  ...langs.map((l) => ({ value: l, label: l.toUpperCase() })),
+];
+
+/* ───────── formatting ───────── */
+const fold = (s: string) =>
+  s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+
+const MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+function shortDate(t: Talk): string {
+  if (t.dateLabel) return t.dateLabel;
+  const [, m, d] = t.date.split("-").map(Number);
+  return `${d} ${MONTHS[m - 1]}`;
+}
+const datetime = (t: Talk) => (t.dateLabel ? t.date.slice(0, 7) : t.date);
+
+const titleText = (t: Talk) => t.title ?? `${t.kind[0].toUpperCase()}${t.kind.slice(1)}`;
+
+function withList(names: string[]): string {
+  return names.length > 1
+    ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`
+    : names[0];
+}
+
+/** Where the title links: the video, else the event page, else the write-up. */
+const primaryHref = (t: Talk) => youtubeUrl(t) ?? t.url ?? t.writeupUrl;
+
+function extraLinks(t: Talk) {
+  const out: { label: string; href: string }[] = [];
+  if (t.url) out.push({ label: "Event", href: t.url });
+  if (t.writeupUrl) out.push({ label: "Write-up", href: t.writeupUrl });
+  if (t.slidesUrl) out.push({ label: "Slides", href: t.slidesUrl });
+  return out;
+}
+
+const haystack = (t: Talk) =>
+  fold(
+    [
+      t.title ?? "",
+      t.conference,
+      t.year,
+      t.kind,
+      t.format ?? "",
+      languageNames[t.language],
+      ...(t.coSpeakers ?? []),
+      t.abstract,
+    ].join(" "),
+  );
+
+const hms = (s: number) =>
+  `${Math.floor(s / 3600)}:${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+
+const ytTitle = (t: Talk) => `${titleText(t)} (${t.conference})`;
+const watchAlt = (t: Talk) => `Watch “${titleText(t)}” at ${t.conference}`;
+
+/* 7x7 pixel play triangle */
+const PLAY = "M1 0h1v7H1zM2 1h1v5H2zM3 2h1v3H3zM4 3h1v1H4z";
+
+let rowIndex = 0;
+
+/** Rows visible before "show all". The script reads it from data-initial. */
+const INITIAL_ROWS = 10;
 ---
-<section id="talks" class="wrap" style="padding-block:6rem"><p class="label">Talks (stub)</p></section>
+
+<section id="talks" class="talks wrap" data-talks data-initial={INITIAL_ROWS}>
+  <SectionHead num="V" title="Talks" kicker="conferences" lede={lede} />
+
+  <!-- ───────── main block: selected keynotes ───────── -->
+  <div class="feature">
+    <h3 class="label feature__title">Selected keynotes</h3>
+
+    {
+      lead && (
+        <article class="lead reveal" aria-labelledby="talks-lead-title">
+          <div class="frame" data-frame>
+            <a class="yt" href={youtubeUrl(lead)} data-yt={lead.youtubeId} data-title={ytTitle(lead)}>
+              <img
+                class="pixelated"
+                src={thumbUrl(lead.youtubeId!)}
+                alt={watchAlt(lead)}
+                width="120"
+                height="90"
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="yt__play yt__play--lg" aria-hidden="true">
+                <svg viewBox="0 0 7 7" shape-rendering="crispEdges">
+                  <path d={PLAY} />
+                </svg>
+              </span>
+            </a>
+          </div>
+          <div class="lead__text">
+            <p class="label lead__meta">
+              <span class="ember">Keynote</span> · {lead.conference} ·{" "}
+              <time datetime={datetime(lead)}>{shortDate(lead)}</time> ·{" "}
+              <abbr title={languageNames[lead.language]}>{lead.language.toUpperCase()}</abbr>
+            </p>
+            <h4 id="talks-lead-title" class="display lead__title">
+              {titleText(lead)}
+            </h4>
+            {lead.abstract && <p class="lead__abs">{lead.abstract}</p>}
+          </div>
+        </article>
+      )
+    }
+
+    <ol class="strip" role="list">
+      {
+        strip.map((t) => (
+          <li class="card reveal">
+            <div class="frame" data-frame>
+              <a class="yt" href={youtubeUrl(t)} data-yt={t.youtubeId} data-title={ytTitle(t)}>
+                <img
+                  class="pixelated"
+                  src={thumbUrl(t.youtubeId!)}
+                  alt={watchAlt(t)}
+                  width="120"
+                  height="90"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span class="yt__play" aria-hidden="true">
+                  <svg viewBox="0 0 7 7" shape-rendering="crispEdges">
+                    <path d={PLAY} />
+                  </svg>
+                </span>
+              </a>
+            </div>
+            <div class="card__text">
+              <h4 class="card__title">{titleText(t)}</h4>
+              <p class="label">
+                {t.conference}
+                {t.language !== "en" && (
+                  <>
+                    {" · "}
+                    <abbr title={languageNames[t.language]}>{t.language.toUpperCase()}</abbr>
+                  </>
+                )}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <!-- ───────── secondary list: every talk ───────── -->
+  <div class="archive">
+    <div class="archive__head reveal">
+      <h3 class="display archive__title">Every talk</h3>
+      <figure class="tally">
+        <svg
+          class="tally__svg"
+          viewBox={`0 0 ${tallyW} ${tallyH}`}
+          width={tallyW * 4}
+          height={tallyH * 4}
+          shape-rendering="crispEdges"
+          role="img"
+          aria-label={tallyLabel}
+        >
+          {
+            tallySquares.map((s) => (
+              <rect
+                x={s.x}
+                y={s.y}
+                width={SQ}
+                height={SQ}
+                class={s.keynote ? "sq sq--key" : "sq"}
+              />
+            ))
+          }
+        </svg>
+        <figcaption class="label tally__cap">
+          <span>{firstYear}</span>
+          <span aria-hidden="true"><span class="ember">■</span> keynote</span>
+          <span>{lastYear}</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="controls" data-controls>
+      <div class="seg" role="group" aria-label="Kind">
+        {
+          kindFilters.map((f) => (
+            <button
+              type="button"
+              class="chip"
+              data-filter="kind"
+              data-value={f.value}
+              aria-pressed={f.value === "all" ? "true" : "false"}
+            >
+              {f.label}
+            </button>
+          ))
+        }
+      </div>
+      <div class="seg" role="group" aria-label="Language">
+        {
+          langFilters.map((f) => (
+            <button
+              type="button"
+              class="chip"
+              data-filter="lang"
+              data-value={f.value}
+              aria-pressed={f.value === "all" ? "true" : "false"}
+              aria-label={f.value === "all" ? "All languages" : languageNames[f.value as TalkLanguage]}
+            >
+              {f.label}
+            </button>
+          ))
+        }
+      </div>
+      <label class="search">
+        <span class="search__ps" aria-hidden="true">&gt;&gt;&gt;</span>
+        <span class="visually-hidden">Search talks</span>
+        <input
+          class="search__input"
+          type="search"
+          placeholder="search"
+          autocomplete="off"
+          spellcheck="false"
+          data-q
+        />
+      </label>
+      <p class="label count" aria-live="polite" data-count>{total} talks</p>
+    </div>
+
+    <div class="years" id="talks-years">
+      {
+        years.map((y) => {
+          const list = talks.filter((t) => t.year === y);
+          const folded = rowIndex >= INITIAL_ROWS;
+          return (
+            <section class="yr" id={`talks-${y}`} aria-labelledby={`talks-${y}-h`} data-year-group={y} hidden={folded}>
+              <h4 id={`talks-${y}-h`} class="display yr__num">
+                {y}
+              </h4>
+              <ol class="yr__list" role="list">
+                {list.map((t) => {
+                  const href = primaryHref(t);
+                  const extra = extraLinks(t);
+                  const idx = rowIndex++;
+                  return (
+                    <li
+                      class="talk"
+                      data-talk
+                      data-i={idx}
+                      data-kind={kindGroup(t.kind)}
+                      data-lang={t.language}
+                      data-q={haystack(t)}
+                      data-year={t.year}
+                      hidden={idx >= INITIAL_ROWS}
+                    >
+                      <time class="label talk__date" datetime={datetime(t)}>
+                        {t.dateLabel ? `c. ${shortDate(t)}` : shortDate(t)}
+                      </time>
+
+                      <div class="talk__body">
+                        <p class="label talk__meta">
+                          {t.conference}
+                          {t.kind !== "talk" && (
+                            <>
+                              {" · "}
+                              <span class={t.kind === "keynote" ? "ember" : undefined}>{t.kind}</span>
+                            </>
+                          )}
+                          {t.language !== "en" && (
+                            <>
+                              {" · "}
+                              <abbr title={languageNames[t.language]}>{t.language.toUpperCase()}</abbr>
+                            </>
+                          )}
+                        </p>
+                        <p class="talk__title">
+                          {href ? <a href={href}>{titleText(t)}</a> : titleText(t)}
+                          {t.title === null && <span class="label talk__fmt">title not published</span>}
+                          {t.format && <span class="label talk__fmt">{t.format}</span>}
+                        </p>
+                        {(t.abstract || t.coSpeakers) && (
+                          <p class="talk__abs">
+                            {t.abstract}
+                            {t.coSpeakers && (
+                              <span class="talk__with">
+                                {t.abstract ? " " : ""}With {withList(t.coSpeakers)}.
+                              </span>
+                            )}
+                            {t.youtubeStart && (
+                              <span class="talk__with"> The video is the full summit. The panel starts at {hms(t.youtubeStart)}.</span>
+                            )}
+                          </p>
+                        )}
+                        {extra.length > 0 && (
+                          <ul class="label talk__links" role="list">
+                            {extra.map((l) => (
+                              <li>
+                                <a href={l.href}>
+                                  {l.label}
+                                  <span class="visually-hidden"> for “{titleText(t)}”</span>
+                                  <span aria-hidden="true"> ↗</span>
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+
+                      {t.youtubeId && (
+                        <a
+                          class="play"
+                          href={youtubeUrl(t)}
+                          data-yt={t.youtubeId}
+                          data-start={t.youtubeStart}
+                          data-title={ytTitle(t)}
+                          data-row-play
+                        >
+                          <svg viewBox="0 0 7 7" shape-rendering="crispEdges" aria-hidden="true">
+                            <path d={PLAY} />
+                          </svg>
+                          <span class="visually-hidden">Play “{titleText(t)}”</span>
+                        </a>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </section>
+          );
+        })
+      }
+    </div>
+
+    <div class="more" data-more hidden={total <= INITIAL_ROWS}>
+      <button type="button" class="btn" aria-expanded="false" aria-controls="talks-years" data-more-btn>
+        <span data-more-label>Show all {total} talks</span>
+      </button>
+    </div>
+
+    <div class="empty" data-empty hidden>
+      <p class="empty__repl">No talks match these filters.</p>
+      <button type="button" class="btn" data-reset>Clear filters</button>
+    </div>
+  </div>
+</section>
+
+<!--
+  The fold, the filters and the count are rendered in their JS state, so the
+  script changes nothing on load. Without JS: show every talk, hide the
+  controls and the "show all" button.
+-->
+<noscript>
+  <style is:inline>
+    [data-talks] [data-talk][hidden] { display: grid !important; }
+    [data-talks] [data-year-group][hidden] { display: block !important; }
+    @media (min-width: 60rem) {
+      [data-talks] [data-year-group][hidden] { display: grid !important; }
+    }
+    [data-talks] [data-controls],
+    [data-talks] [data-more] { display: none !important; }
+  </style>
+</noscript>
+
+<style>
+  .talks {
+    padding-block: var(--space-8) var(--space-7);
+  }
+
+  /* ───────── pixel video thumbnails (lite embed) ───────── */
+  .frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: 2px solid var(--line-2);
+    background: var(--ink-2);
+  }
+  /* the player markup is created by the script, so it needs :global() */
+  .frame :global(iframe),
+  .talk :global(.talk__player iframe) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: var(--ink);
+  }
+  .yt {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+  }
+  .yt img {
+    width: 100%;
+    height: 100%;
+    /* YouTube's 120x90 thumbnail is 4:3 with black bars; cover crops them */
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.15) brightness(0.8);
+    transition: filter 0.3s steps(3);
+  }
+  .yt:hover img,
+  .yt:focus-visible img {
+    filter: none;
+  }
+  .yt:focus-visible {
+    outline-offset: -3px;
+  }
+  .yt__play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    translate: -50% -50%;
+    border: 2px solid var(--bone);
+    background: var(--ink);
+    color: var(--ember);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .yt__play svg {
+    width: 0.9rem;
+    height: 0.9rem;
+    margin-left: 0.15rem;
+    fill: currentColor;
+  }
+  .yt__play--lg {
+    width: 3.5rem;
+    height: 3.5rem;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .yt__play--lg svg {
+    width: 1.3rem;
+    height: 1.3rem;
+  }
+  .yt:hover .yt__play,
+  .yt:focus-visible .yt__play {
+    background: var(--ember);
+    border-color: var(--ember);
+    color: var(--ink);
+  }
+
+  /* ───────── selected keynotes ───────── */
+  .feature {
+    margin-bottom: var(--space-8);
+  }
+  .feature__title {
+    margin-bottom: var(--space-4);
+  }
+  .lead {
+    display: grid;
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+  }
+  .lead .frame {
+    box-shadow: 6px 6px 0 var(--ink-3);
+  }
+  .lead__text {
+    display: grid;
+    gap: var(--space-3);
+    align-content: center;
+  }
+  .lead__title {
+    font-size: var(--step-4);
+    line-height: 0.95;
+    overflow-wrap: break-word;
+  }
+  .lead__abs {
+    max-width: 34rem;
+    color: var(--ash);
+  }
+  abbr {
+    text-decoration: none;
+  }
+  @media (min-width: 56rem) {
+    .lead {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: var(--space-6);
+    }
+  }
+
+  .strip {
+    display: grid;
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .card {
+    display: grid;
+    grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: center;
+  }
+  .card__text {
+    display: grid;
+    gap: var(--space-1);
+  }
+  .card__title {
+    font-family: var(--f-body);
+    font-size: var(--step-0);
+    font-weight: 400;
+    line-height: 1.3;
+    text-wrap: pretty;
+  }
+  .card .yt__play {
+    width: 2rem;
+    height: 2rem;
+  }
+  .card .yt__play svg {
+    width: 0.7rem;
+    height: 0.7rem;
+  }
+  @media (min-width: 40rem) {
+    .card {
+      grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+    }
+  }
+  @media (min-width: 64rem) {
+    .strip {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    .card {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+      align-content: start;
+    }
+    .card__title {
+      font-size: var(--step--1);
+    }
+  }
+
+  /* ───────── archive head + tally ───────── */
+  .archive__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+  }
+  .archive__title {
+    font-size: var(--step-3);
+    line-height: 1;
+  }
+  .tally {
+    margin: 0;
+    display: grid;
+    gap: var(--space-2);
+    width: 11rem;
+  }
+  @media (min-width: 48rem) {
+    .tally {
+      width: 14.5rem;
+    }
+  }
+  .tally__svg {
+    width: 100%;
+    height: auto;
+  }
+  .sq {
+    fill: var(--ash);
+  }
+  .sq--key {
+    fill: var(--ember);
+  }
+  .tally__cap {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    font-size: 0.62rem;
+  }
+
+  /* ───────── controls ───────── */
+  .controls:not([hidden]) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-5);
+    margin-bottom: var(--space-6);
+  }
+  .seg {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .chip {
+    padding: 0.4em 0.7em 0.35em;
+    border: 2px solid var(--line-2);
+    border-radius: 0;
+    background: var(--ink);
+    color: var(--ash);
+    font-family: var(--f-pixel);
+    font-size: var(--step--2);
+    text-transform: uppercase;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+  .chip:hover {
+    border-color: var(--ash);
+    color: var(--bone);
+  }
+  .chip[aria-pressed="true"] {
+    border-color: var(--bone);
+    color: var(--bone);
+    box-shadow: 3px 3px 0 var(--ember);
+  }
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    flex: 1 1 10rem;
+    max-width: 16rem;
+    padding-bottom: 0.2em;
+    border-bottom: 2px solid var(--line-2);
+    cursor: text;
+  }
+  .search:focus-within {
+    border-color: var(--ember);
+  }
+  .search__ps {
+    color: var(--ember);
+    font-size: var(--step--1);
+  }
+  .search__input {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--bone);
+    font-family: var(--f-body);
+    font-size: var(--step--1);
+    outline: none;
+    caret-color: var(--ember);
+  }
+  .search__input::placeholder {
+    color: var(--dust);
+  }
+  .count {
+    margin-left: auto;
+  }
+
+  /* ───────── year groups ───────── */
+  .yr[hidden] {
+    display: none;
+  }
+  .yr + .yr {
+    margin-top: var(--space-6);
+  }
+  .yr__num {
+    font-size: var(--step-3);
+    line-height: 1;
+    color: var(--gold);
+    margin-bottom: var(--space-2);
+  }
+  .yr__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 60rem) {
+    .yr {
+      display: grid;
+      grid-template-columns: 9rem minmax(0, 1fr);
+      column-gap: var(--space-5);
+    }
+    .yr__num {
+      position: sticky;
+      top: 5rem;
+      align-self: start;
+      font-size: var(--step-4);
+      line-height: 0.9;
+      margin: 0;
+      padding-top: var(--space-2);
+    }
+  }
+
+  /* ───────── a talk row ───────── */
+  .talk {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "date play"
+      "body play"
+      "player player";
+    column-gap: var(--space-4);
+    row-gap: var(--space-1);
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--line);
+  }
+  .talk[hidden] {
+    display: none;
+  }
+  .talk__date {
+    grid-area: date;
+    color: var(--bone);
+    white-space: nowrap;
+  }
+  .talk__body {
+    grid-area: body;
+    display: grid;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+  .talk__title {
+    color: var(--bone);
+    overflow-wrap: break-word;
+  }
+  .talk__title a {
+    text-decoration: none;
+  }
+  .talk__title a:hover {
+    color: var(--ember);
+  }
+  .talk__fmt {
+    margin-left: 0.8em;
+    white-space: nowrap;
+  }
+  .talk__abs {
+    max-width: 44rem;
+    font-size: var(--step--1);
+    line-height: 1.6;
+    color: var(--ash);
+  }
+  .talk__with {
+    color: var(--dust);
+  }
+  .talk__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin: var(--space-1) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .talk__links a {
+    text-decoration: none;
+    color: var(--ash);
+  }
+  .talk__links a:hover {
+    color: var(--ember);
+  }
+
+  .play {
+    grid-area: play;
+    align-self: start;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 2px solid var(--line-2);
+    background: var(--ink);
+    color: var(--ember);
+    text-decoration: none;
+  }
+  .play svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-left: 0.1rem;
+    fill: currentColor;
+  }
+  .play:hover,
+  .play:focus-visible,
+  .talk.is-playing .play {
+    border-color: var(--ember);
+    background: var(--ember);
+    color: var(--ink);
+  }
+
+  .talk :global(.talk__player) {
+    grid-area: player;
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+  .talk :global(.talk__player-frame) {
+    aspect-ratio: 16 / 9;
+    border: 2px solid var(--line-2);
+    background: var(--ink-2);
+  }
+  .talk :global(.talk__player-bar) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .talk :global(.talk__close) {
+    padding: 0.35em 0.7em;
+    border: 2px solid var(--line-2);
+    border-radius: 0;
+    background: var(--ink);
+    color: var(--ash);
+    font-family: var(--f-pixel);
+    font-size: var(--step--2);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .talk :global(.talk__close:hover) {
+    border-color: var(--ember);
+    color: var(--ember);
+  }
+
+  @media (min-width: 48rem) {
+    .talk {
+      grid-template-columns: 6rem minmax(0, 1fr) auto;
+      grid-template-areas:
+        "date body play"
+        "player player player";
+    }
+    .talk__date {
+      padding-top: 0.15rem;
+    }
+  }
+
+  /* ───────── show all / empty ───────── */
+  .more:not([hidden]) {
+    display: block;
+    margin-top: var(--space-6);
+  }
+  .more .btn,
+  .empty .btn {
+    cursor: pointer;
+    border-radius: 0;
+  }
+  .empty:not([hidden]) {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-5);
+    padding-block: var(--space-6);
+  }
+  .empty__repl {
+    font-size: var(--step--1);
+    color: var(--bone);
+    overflow-wrap: anywhere;
+  }
+  .empty__out {
+    color: var(--dust);
+  }
+</style>
+
+<script>
+  const fold = (s: string) =>
+    s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+
+  function makeIframe(a: HTMLElement): HTMLIFrameElement {
+    const id = a.dataset.yt ?? "";
+    const start = a.dataset.start ? `&start=${a.dataset.start}` : "";
+    const f = document.createElement("iframe");
+    f.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0${start}`;
+    f.title = `Video: ${a.dataset.title ?? "talk"}`;
+    f.allow =
+      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    f.allowFullscreen = true;
+    f.referrerPolicy = "strict-origin-when-cross-origin";
+    return f;
+  }
+
+  const modified = (e: MouseEvent) =>
+    e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0;
+
+  function init(root: HTMLElement) {
+    /** Rows visible before "show all". */
+    const INITIAL_ROWS = Number(root.dataset.initial) || 10;
+
+    /* ── keynote plates: swap the thumbnail for the player ── */
+    root.querySelectorAll<HTMLElement>("[data-frame]").forEach((frame) => {
+      const a = frame.querySelector<HTMLAnchorElement>("a[data-yt]");
+      a?.addEventListener("click", (e) => {
+        if (modified(e)) return;
+        e.preventDefault();
+        const f = makeIframe(a);
+        frame.replaceChildren(f);
+        f.focus();
+      });
+    });
+
+    /* ── index rows: open a player under the row ── */
+    let open: HTMLElement | null = null;
+    const close = (row: HTMLElement | null, refocus = false) => {
+      if (!row) return;
+      row.querySelector(".talk__player")?.remove();
+      row.classList.remove("is-playing");
+      const btn = row.querySelector<HTMLElement>("[data-row-play]");
+      btn?.setAttribute("aria-expanded", "false");
+      if (refocus) btn?.focus();
+      if (open === row) open = null;
+    };
+
+    root.querySelectorAll<HTMLAnchorElement>("a[data-row-play]").forEach((a) => {
+      a.setAttribute("aria-expanded", "false");
+      a.addEventListener("click", (e) => {
+        if (modified(e)) return;
+        e.preventDefault();
+        const row = a.closest<HTMLElement>("[data-talk]");
+        if (!row) return;
+        if (open === row) {
+          close(row, true);
+          return;
+        }
+        close(open);
+        const wrap = document.createElement("div");
+        wrap.className = "talk__player";
+        const frame = document.createElement("div");
+        frame.className = "talk__player-frame";
+        const f = makeIframe(a);
+        frame.append(f);
+        const bar = document.createElement("div");
+        bar.className = "talk__player-bar";
+        const lbl = document.createElement("span");
+        lbl.className = "label";
+        lbl.textContent = "youtube-nocookie.com";
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "talk__close";
+        btn.textContent = "Close video";
+        btn.addEventListener("click", () => close(row, true));
+        bar.append(lbl, btn);
+        wrap.append(frame, bar);
+        row.append(wrap);
+        row.classList.add("is-playing");
+        a.setAttribute("aria-expanded", "true");
+        open = row;
+        f.focus();
+      });
+    });
+
+    /* ── filters + fold ── */
+    const controls = root.querySelector<HTMLElement>("[data-controls]");
+    const rows = Array.from(root.querySelectorAll<HTMLElement>("[data-talk]"));
+    const groups = Array.from(root.querySelectorAll<HTMLElement>("[data-year-group]"));
+    const count = root.querySelector<HTMLElement>("[data-count]");
+    const empty = root.querySelector<HTMLElement>("[data-empty]");
+    const q = root.querySelector<HTMLInputElement>("[data-q]");
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-filter]"));
+    const more = root.querySelector<HTMLElement>("[data-more]");
+    const moreBtn = root.querySelector<HTMLButtonElement>("[data-more-btn]");
+    const moreLabel = root.querySelector<HTMLElement>("[data-more-label]");
+    if (!controls || !count || !empty || !q || !more || !moreBtn || !moreLabel) return;
+    controls.hidden = false;
+
+    const total = rows.length;
+    const allLabel = moreLabel.textContent ?? "Show all";
+    const state = { kind: "all", lang: "all", terms: [] as string[] };
+    let expanded = false;
+
+    const filtering = () =>
+      state.kind !== "all" || state.lang !== "all" || state.terms.length > 0;
+
+    const match = (r: HTMLElement) =>
+      (state.kind === "all" || r.dataset.kind === state.kind) &&
+      (state.lang === "all" || r.dataset.lang === state.lang) &&
+      state.terms.every((t) => (r.dataset.q ?? "").includes(t));
+
+    const apply = () => {
+      const folded = !expanded && !filtering();
+      let matched = 0;
+      for (const r of rows) {
+        const ok = match(r);
+        if (ok) matched++;
+        const visible = ok && (!folded || Number(r.dataset.i) < INITIAL_ROWS);
+        r.hidden = !visible;
+        if (!visible && open === r) close(r);
+      }
+      for (const g of groups) {
+        g.hidden = !g.querySelector("[data-talk]:not([hidden])");
+      }
+      count.textContent = filtering()
+        ? `Showing ${matched} of ${total}`
+        : `${total} talks`;
+      empty.hidden = matched > 0;
+      more.hidden = filtering() || total <= INITIAL_ROWS;
+      moreBtn.setAttribute("aria-expanded", String(expanded));
+      moreLabel.textContent = expanded ? "Show fewer" : allLabel;
+    };
+
+    for (const btn of buttons) {
+      btn.addEventListener("click", () => {
+        const dim = btn.dataset.filter as "kind" | "lang";
+        state[dim] = btn.dataset.value!;
+        for (const b of buttons)
+          if (b.dataset.filter === dim) b.setAttribute("aria-pressed", String(b === btn));
+        apply();
+      });
+    }
+
+    q.addEventListener("input", () => {
+      state.terms = fold(q.value).split(/\s+/).filter(Boolean);
+      apply();
+    });
+    q.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && q.value) {
+        q.value = "";
+        state.terms = [];
+        apply();
+      }
+    });
+
+    moreBtn.addEventListener("click", () => {
+      expanded = !expanded;
+      apply();
+      if (!expanded) root.querySelector("#talks-years")?.scrollIntoView({ block: "start" });
+    });
+
+    root.querySelector<HTMLButtonElement>("[data-reset]")?.addEventListener("click", () => {
+      state.kind = "all";
+      state.lang = "all";
+      state.terms = [];
+      q.value = "";
+      for (const b of buttons) b.setAttribute("aria-pressed", String(b.dataset.value === "all"));
+      apply();
+      q.focus();
+    });
+
+    // A link to a folded year (e.g. #talks-2019) unfolds the list first.
+    const unfoldForHash = () => {
+      const id = location.hash.slice(1);
+      if (!/^talks-\d{4}$/.test(id)) return;
+      const target = root.querySelector<HTMLElement>(`#${id}`);
+      if (target?.hidden && !expanded) {
+        expanded = true;
+        apply();
+        target.scrollIntoView({ block: "start" });
+      }
+    };
+    window.addEventListener("hashchange", unfoldForHash);
+
+    apply();
+    unfoldForHash();
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-talks]").forEach((el) => init(el));
+</script>

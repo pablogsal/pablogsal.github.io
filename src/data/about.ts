@@ -54,17 +54,11 @@ export const traceback: Frame[] = [
   },
 ];
 
-export const finalError = {
-  type: "CuriosityError",
-  msg: "fell into the interpreter and never came back",
-  hint: "pablogsal",
-};
-
 export const bio: string[] = [
-  "Most days I work on the Python interpreter, on the parts you only notice when something goes wrong: the parser, the error messages, the tracebacks, and the machinery that lets debuggers and profilers look inside a running process.",
-  "I came to software from theoretical physics. My PhD was on general relativity and black holes, and I picked up Python to glue together C simulation code. Eventually the glue became more interesting than the simulation.",
-  "I have been a CPython core developer since 2018, have served on the Python Steering Council every term since 2021, and was the release manager for Python 3.10 and 3.11. I spent years on Bloomberg's Python Infrastructure team, where Memray and PyStack were born. These days I am on the Python team at Hudson River Trading, in London.",
-  "I hate symbols but I love linkers. <em>My cat, BMO, does not code.</em>",
+  "Most days I work on the Python interpreter. I work on the parts you see when something goes wrong: the parser, the error messages and the tracebacks. I also work on the code that lets debuggers and profilers look inside a running process.",
+  "I came to software from theoretical physics. My PhD was on general relativity and black holes. I learned Python to glue together C simulation code. Later, Python itself became more interesting to me than the simulations.",
+  "I have been a CPython core developer since 2018. I have been on the Python Steering Council every term since 2021. I was the release manager for Python 3.10 and 3.11.",
+  "I work on the Python team at Hudson River Trading, in London.",
 ];
 
 export const facts: { k: string; v: string }[] = [

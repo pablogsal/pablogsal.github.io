@@ -1,39 +1,35 @@
 ---
 import { Image } from "astro:assets";
-import portrait from "../assets/pablo.jpeg";
+import portrait from "../assets/pablo-dither-160.png";
 import SectionHead from "./SectionHead.astro";
-import { traceback, finalError, bio, facts } from "../data/about";
+import { traceback, bio, facts } from "../data/about";
 ---
 
 <section id="about" class="wrap about">
-  <SectionHead num="I" title="The traceback" kicker="most recent call last" />
+  <SectionHead num="I" title="About" />
 
   <div class="grid">
     <figure class="plate reveal">
       <div class="plate__frame">
         <Image
           src={portrait}
-          alt="Black and white portrait of Pablo wearing an ornate dark mask with horns and hanging chains"
-          width={460}
-          height={460}
+          alt="Pixel portrait of Pablo wearing an ornate dark mask"
+          width={160}
+          height={160}
+          format="png"
           loading="lazy"
         />
       </div>
-      <figcaption class="label">
-        <span>Fig. 1</span>
-        <span>The author, dressed for a release day</span>
-      </figcaption>
     </figure>
 
     <div class="text">
-      <pre class="tb reveal" aria-label="A Python traceback that tells Pablo's life story"><code><span class="tb__head">Traceback (most recent call last):</span>
+      <pre class="tb reveal" aria-label="A Python traceback. Each frame is an event in my life. The line number is the year."><code><span class="tb__head">Traceback (most recent call last):</span>
 {traceback.map((f) => (
   <span class="tb__frame">  File <span class="tb__file">"{f.file}"</span>, line <span class="tb__line">{f.line}</span>, in <span class="tb__fn">{f.fn}</span>
     {f.pre}<span class="tb__hl">{f.hl}</span>{f.post}
     {" ".repeat(f.pre.length)}<span class="ember">{"^".repeat(f.hl.length)}</span>
 </span>
-))}<span class="tb__err"><span class="ember">{finalError.type}</span>: {finalError.msg}</span>
-<span class="tb__hint">Did you mean: <span class="ember">'{finalError.hint}'</span>?</span></code></pre>
+))}</code></pre>
 
       <div class="bio reveal">
         {bio.map((p) => <p set:html={p} />)}
@@ -78,24 +74,13 @@ import { traceback, finalError, bio, facts } from "../data/about";
     max-width: 26rem;
   }
   .plate__frame {
-    padding: 0.6rem;
-    border: 1px solid var(--line-2);
-    outline: 1px solid var(--line);
-    outline-offset: 5px;
+    border: 2px solid var(--line-2);
+    box-shadow: 6px 6px 0 var(--ink-3);
   }
   .plate__frame :global(img) {
     width: 100%;
     height: auto;
-    filter: grayscale(1) contrast(1.08);
-  }
-  .plate figcaption {
-    display: flex;
-    gap: var(--space-4);
-    margin-top: var(--space-4);
-  }
-  .plate figcaption span:first-child {
-    color: var(--ember);
-    white-space: nowrap;
+    image-rendering: pixelated;
   }
 
   .text {
@@ -109,8 +94,7 @@ import { traceback, finalError, bio, facts } from "../data/about";
     padding: var(--space-5);
     overflow-x: auto;
     background: var(--ink-2);
-    border: 1px solid var(--line);
-    border-left: 2px solid var(--ember-dim);
+    border: 2px solid var(--line-2);
     font-size: clamp(0.7rem, 0.62rem + 0.35vw, 0.86rem);
     line-height: 1.6;
     color: var(--ash);
@@ -141,16 +125,6 @@ import { traceback, finalError, bio, facts } from "../data/about";
     display: grid;
     gap: var(--space-4);
     max-width: 40rem;
-    font-size: var(--step-1);
-    line-height: 1.5;
-  }
-  .bio :global(p:first-child::first-letter) {
-    float: left;
-    margin: 0.08em 0.12em 0 0;
-    font-family: var(--f-display);
-    font-size: 3.6em;
-    line-height: 0.8;
-    color: var(--ember);
   }
   .bio :global(em) {
     color: var(--ash);
@@ -169,6 +143,5 @@ import { traceback, finalError, bio, facts } from "../data/about";
   }
   .facts dd {
     margin: var(--space-1) 0 0;
-    font-size: var(--step-0);
   }
 </style>

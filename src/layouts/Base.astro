@@ -1,4 +1,5 @@
 ---
+import "../styles/fonts.css";
 import "../styles/global.css";
 import { site, nav } from "../data/site";
 
@@ -28,15 +29,18 @@ const ogImage = new URL("/og.png", Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.name}, CPython core developer`} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:site" content="@pyblogsal" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Grenze+Gotisch:wght@400..900&family=JetBrains+Mono:ital,wght@0,300..700;1,400&display=swap"
-    />
+    {/* Self-hosted fonts (src/styles/fonts.css). All three are used above the fold. */}
+    <link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/jacquard-24.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/silkscreen.woff2" as="font" type="font/woff2" crossorigin />
     <slot name="head" />
   </head>
   <body>
@@ -67,12 +71,11 @@ const ogImage = new URL("/og.png", Astro.site);
 
     <footer class="colophon">
       <div class="wrap colophon__inner">
-        <p class="exit mono"><span class="ember">&gt;&gt;&gt;</span> exit()</p>
         <div class="colophon__grid">
           <p class="colophon__note">
-            Set in Grenze Gotisch, EB Garamond and JetBrains Mono. Built with
-            Astro, hand-written CSS and no framework, because the
-            interpreter already has enough layers.
+            Set in Jacquard 24, Silkscreen and JetBrains Mono. Built with
+            Astro and hand-written CSS. The data updates every day from
+            GitHub, the PEP index and the core.py feed.
           </p>
           <ul class="colophon__links mono">
             {
@@ -87,14 +90,16 @@ const ogImage = new URL("/og.png", Astro.site);
           </ul>
         </div>
         <p class="label">
-          © {new Date().getFullYear()} {site.name} · Process finished with exit code 0
+          © {new Date().getFullYear()} {site.name}
         </p>
       </div>
     </footer>
 
-    <div class="grain" aria-hidden="true"></div>
-
     <script>
+      // Opacity-only reveal. Anything already on screen (or above it, for an
+      // anchor load) is marked visible before html.js hides the rest, so
+      // nothing that has been painted ever blinks out.
+      const els = document.querySelectorAll<HTMLElement>(".reveal");
       const io = new IntersectionObserver(
         (entries) => {
           for (const e of entries) {
@@ -104,9 +109,13 @@ const ogImage = new URL("/og.png", Astro.site);
             }
           }
         },
-        { rootMargin: "0px 0px -8% 0px" },
+        { rootMargin: "0px 0px 10% 0px" },
       );
-      document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      els.forEach((el) => {
+        if (el.getBoundingClientRect().top < innerHeight) el.classList.add("is-in");
+        else io.observe(el);
+      });
+      document.documentElement.classList.add("js");
     </script>
   </body>
 </html>
@@ -129,10 +138,8 @@ const ogImage = new URL("/og.png", Astro.site);
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 50;
-    background: color-mix(in srgb, var(--ink) 72%, transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+    background: var(--ink);
+    border-bottom: 2px solid var(--line);
   }
   .topbar__inner {
     display: flex;
@@ -149,7 +156,7 @@ const ogImage = new URL("/og.png", Astro.site);
     flex-shrink: 0;
   }
   .sigil-link .display {
-    font-size: 1.9rem;
+    font-size: 2.2rem;
     line-height: 1;
     color: var(--ember);
   }
@@ -167,9 +174,9 @@ const ogImage = new URL("/og.png", Astro.site);
     scrollbar-width: none;
   }
   nav a {
-    font-family: var(--f-mono);
+    font-family: var(--f-pixel);
     font-size: var(--step--2);
-    letter-spacing: 0.1em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     text-decoration: none;
     color: var(--ash);
@@ -178,9 +185,22 @@ const ogImage = new URL("/og.png", Astro.site);
   nav a:hover {
     color: var(--ember);
   }
+  /* small screens: all five links in one row. The size and gaps follow the
+     viewport width so the row fits from 320px up; overflow-x stays as a
+     safety net for very large user font sizes. */
   @media (max-width: 34rem) {
-    nav li:nth-child(n + 4) {
-      display: none;
+    .topbar__inner {
+      gap: var(--space-3);
+    }
+    nav {
+      min-width: 0;
+    }
+    nav ul {
+      gap: clamp(0.4rem, 2.5vw, 1rem);
+    }
+    nav a {
+      font-size: min(var(--step--2), 2.5vw);
+      letter-spacing: 0;
     }
   }
 
@@ -192,9 +212,6 @@ const ogImage = new URL("/og.png", Astro.site);
   .colophon__inner {
     display: grid;
     gap: var(--space-6);
-  }
-  .exit {
-    font-size: var(--step-2);
   }
   .colophon__grid {
     display: grid;
@@ -208,7 +225,6 @@ const ogImage = new URL("/og.png", Astro.site);
   .colophon__note {
     max-width: 34rem;
     color: var(--ash);
-    font-style: italic;
   }
   .colophon__links {
     display: grid;
@@ -219,12 +235,4 @@ const ogImage = new URL("/og.png", Astro.site);
     font-size: var(--step--1);
   }
 
-  .grain {
-    position: fixed;
-    inset: -50%;
-    z-index: 200;
-    pointer-events: none;
-    opacity: 0.06;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
 </style>

@@ -1,8 +1,12 @@
 # pablogsal.com: design brief
 
+> **UPDATE: the direction is now PIXEL ART and LESS BUSY. The section
+> "Pixel art direction" at the end overrides older rules above where they
+> conflict (fonts, grain, sigils, hairline density, figures).**
+
 **Concept: a grimoire of the interpreter.**
-Pablo Galindo Salgado is a CPython core developer, former Steering Council
-member, release manager, author of the PEG parser, f-string grammar, and
+Pablo Galindo Salgado is a CPython core developer, Steering Council
+member (2021 to 2026), release manager, author of the PEG parser, f-string grammar, and
 fine-grained tracebacks, co-creator of memray and pystack ("forbidden magic"),
 co-host of core.py, and a former black-hole physicist. His portrait is a
 black-and-white photo in an ornate gothic mask. His talk titles quote Dante
@@ -61,12 +65,77 @@ Spacing: `--space-1`…`--space-8`. Content max width: `--measure: 72rem`.
   horizontal scroll.
 - Images: YouTube thumbnails from `https://i.ytimg.com/vi/<id>/hqdefault.jpg`
   shown grayscale (`filter: grayscale(1) contrast(1.1)`), revealing color on hover.
-- Voice: first person, confident, dry humor, brief. No marketing fluff,
-  no exclamation-mark hype. Accuracy over flourish: only claim verified facts.
-- No em dashes in copy.
+- Voice: see "Writing rules" below. They are mandatory for all copy.
 
 ## Architecture
 Astro 5, zero UI frameworks, hand-written CSS (component `<style>` blocks,
 scoped). Content lives in typed data files under `src/data/*.ts` so Pablo can
 edit without touching markup. Sections are components in `src/components/`.
 Client JS: small inline `<script>` tags per component, vanilla TS.
+
+## Writing rules (ASD-STE100 Simplified Technical English, adapted)
+
+All visible text follows these rules.
+
+NO FORCED JOKES. Pablo dislikes cute filler: quirky captions ("The author,
+dressed for a release day"), winks, puns, "fun facts", clever section
+subtitles. Do not write any. Captions and labels state plain facts or are
+removed. Humor is allowed only when it is Pablo's own words (for example his
+GitHub bio line) or a real fact.
+
+1. Sentences are short: 20 words or fewer. Descriptions can go to 25.
+2. One idea per sentence. Paragraphs have 4 sentences or fewer.
+3. Use the active voice. "I wrote the PEG parser", not "The PEG parser was written".
+4. Use simple verb tenses: present, simple past, simple future.
+5. Use simple, common words. "use" not "utilize", "wrote" not "authored",
+   "help" not "facilitate", "is" not "serves as" / "stands as".
+6. Use the same word for the same thing every time (e.g. always "Memray",
+   never "the profiler" in one place and "the tool" in another for the same thing).
+7. Keep articles ("a", "the"). Do not write in telegraph style.
+8. State facts. Give numbers, versions, dates, names. No adjectives that only praise.
+9. First person, plain, dry. Humor comes from specific facts, not from hype.
+
+Do NOT use these AI-writing patterns:
+- Puffery words: pivotal, crucial, vital, key (adjective), robust, seamless,
+  groundbreaking, renowned, vibrant, rich, profound, powerful, cutting-edge,
+  innovative, comprehensive, meticulous, intricate, tapestry, landscape,
+  testament, delve, dive into, deep dive, journey, realm, leverage, empower,
+  unlock, elevate, showcase, highlight (verb), underscore, foster, enhance,
+  boast, garner, bolster, navigate (figurative), craft (verb for software).
+- "Serves as", "stands as", "marks", "represents", "features", "offers" when "is"/"has" works.
+- Negative parallelisms: "not just X, but Y", "not X, it is Y", "no X, no Y, just Z".
+- Rule-of-three lists used for rhythm ("fast, simple, and elegant").
+- Trailing "-ing" analysis clauses (", making it...", ", ensuring...", ", highlighting...").
+- Claims about importance, legacy, impact, or "the community".
+- Em dashes. Use a period, a comma, a colon or parentheses.
+- Exclamation marks, emoji, rhetorical questions in prose.
+- Title Case In Headings (use sentence case, except proper names).
+
+## Pixel art direction (overrides older rules)
+
+Same world (dark, ink/bone/ember, black hole, interpreter internals), now
+drawn as pixel art, like 1-bit dithered engravings (Return of the Obra Dinn,
+Playdate). Calm and sparse.
+
+Type:
+- `--f-display`: "Jacquard 24", a pixel blackletter. Big titles only.
+- `--f-pixel`: "Silkscreen". Labels, tags, nav, buttons, small caps. Uppercase, small.
+- `--f-body`: "JetBrains Mono". All body text. (`--f-serif` is an alias for it.)
+
+Pixel rules:
+- Square corners. Borders are 2px solid (`--line-2` or `--bone`), no 1px hairlines
+  for boxes. Rules between list rows can stay 1px `--line`.
+- Shadows: only a hard offset (`4px 4px 0 var(--ink-3)` or ember), never blur.
+- Images: pixelated. Downscale, then upscale with `image-rendering: pixelated`.
+  Grayscale or 1-bit dithered. The portrait is a pre-dithered 1-bit PNG.
+- Illustrations: small pixel sprites (inline SVG with `shape-rendering="crispEdges"`
+  on an integer grid, or CSS grids of squares). Few colors: ink, grey, bone, ember.
+- Dithered fills (`.dither` utility in global.css) instead of gradients.
+- Motion: stepped, not smooth. For example `steps()` easing and blink cursors. Keep it rare.
+
+Less busy:
+- At most ONE decorative element per section.
+- No rotating sigils, no text on paths, no grain overlay, no sky grids.
+- Each section: title, one short lede, one main block, and optionally one
+  secondary list. Collapse long lists behind "show all" (8 to 12 rows visible).
+- At most 3 text styles per section. More empty space between blocks.

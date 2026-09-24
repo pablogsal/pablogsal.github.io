@@ -1,0 +1,426 @@
+{
+  "fetchedAt": "2026-09-24T16:47:01.555Z",
+  "profile": {
+    "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
+    "followers": 1203,
+    "htmlUrl": "https://github.com/pablogsal",
+    "login": "pablogsal",
+    "publicRepos": 100
+  },
+  "repos": {
+    "bloomberg/memray": {
+      "description": "Memray is a memory profiler for Python",
+      "forks": 466,
+      "homepage": "https://bloomberg.github.io/memray/",
+      "htmlUrl": "https://github.com/bloomberg/memray",
+      "language": "Python",
+      "pushedAt": "2026-09-23T00:22:41Z",
+      "stars": 15241
+    },
+    "bloomberg/pystack": {
+      "description": "🔍 🐍 Like pstack but for Python!",
+      "forks": 73,
+      "homepage": "https://bloomberg.github.io/pystack",
+      "htmlUrl": "https://github.com/bloomberg/pystack",
+      "language": "C++",
+      "pushedAt": "2026-09-23T16:52:50Z",
+      "stars": 1218
+    },
+    "bloomberg/pytest-memray": {
+      "description": "pytest plugin for easy integration of memray memory profiler",
+      "forks": 40,
+      "homepage": "https://pytest-memray.readthedocs.io/en/latest/",
+      "htmlUrl": "https://github.com/bloomberg/pytest-memray",
+      "language": "Python",
+      "pushedAt": "2026-09-21T17:22:00Z",
+      "stars": 424
+    },
+    "pablogsal/IPcam_tracker": {
+      "description": "A motion detector tracker based on OpenCV for my IP camera.",
+      "forks": 10,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/IPcam_tracker",
+      "language": "Python",
+      "pushedAt": "2016-06-29T14:35:26Z",
+      "stars": 22
+    },
+    "pablogsal/ShadowEngine": {
+      "description": "A raytracer for the Kerr spacetime written in CUDA",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/ShadowEngine",
+      "language": "Cuda",
+      "pushedAt": "2023-09-09T16:09:44Z",
+      "stars": 0
+    },
+    "pablogsal/a_star_algorithm": {
+      "description": "A pythonic implementation of the A* algorithm.",
+      "forks": 4,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/a_star_algorithm",
+      "language": "Python",
+      "pushedAt": "2023-05-23T12:29:19Z",
+      "stars": 37
+    },
+    "pablogsal/assert_gatherer": {
+      "description": null,
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/assert_gatherer",
+      "language": "Python",
+      "pushedAt": "2024-10-16T18:19:53Z",
+      "stars": 0
+    },
+    "pablogsal/black-pycharm": {
+      "description": "Pycharm plugin for https://github.com/ambv/black",
+      "forks": 12,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/black-pycharm",
+      "language": "Java",
+      "pushedAt": "2020-01-20T18:28:02Z",
+      "stars": 32
+    },
+    "pablogsal/buildbot_reporter": {
+      "description": "Tool to produce buildbot failure reports from buildbot build urls.",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/buildbot_reporter",
+      "language": "Python",
+      "pushedAt": "2021-04-20T18:25:42Z",
+      "stars": 0
+    },
+    "pablogsal/coffee_tracker": {
+      "description": "Personal coffee tracker webapp made in Flask",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/coffee_tracker",
+      "language": "JavaScript",
+      "pushedAt": "2016-12-29T22:11:04Z",
+      "stars": 0
+    },
+    "pablogsal/cpython-unwind": {
+      "description": null,
+      "forks": 2,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/cpython-unwind",
+      "language": "C",
+      "pushedAt": "2026-01-07T20:18:16Z",
+      "stars": 6
+    },
+    "pablogsal/cpython_leaderboard": {
+      "description": "  Tracking number of merged pull requests from contributors and other core devs",
+      "forks": 2,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/cpython_leaderboard",
+      "language": "CSS",
+      "pushedAt": "2021-03-20T01:44:25Z",
+      "stars": 1
+    },
+    "pablogsal/cpython_stats": {
+      "description": "Webpage to display statistics about Cpython pull_requests ",
+      "forks": 1,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/cpython_stats",
+      "language": "Python",
+      "pushedAt": "2022-12-08T00:50:32Z",
+      "stars": 1
+    },
+    "pablogsal/cuda_lenia": {
+      "description": "A CUDA/OpenGL simulation for Lenia particles",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/cuda_lenia",
+      "language": "Cuda",
+      "pushedAt": "2023-09-18T11:02:47Z",
+      "stars": 1
+    },
+    "pablogsal/elfutils": {
+      "description": "Personal fork of elfutils",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/elfutils",
+      "language": "C",
+      "pushedAt": "2026-02-15T04:15:27Z",
+      "stars": 0
+    },
+    "pablogsal/fenix": {
+      "description": "Make your python dead processes come back to life!",
+      "forks": 2,
+      "homepage": "https://pablogsal.github.io/fenix/",
+      "htmlUrl": "https://github.com/pablogsal/fenix",
+      "language": "Python",
+      "pushedAt": "2017-10-22T01:24:16Z",
+      "stars": 0
+    },
+    "pablogsal/gdb-emoji": {
+      "description": " Visualize your pointers as emojis ",
+      "forks": 1,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/gdb-emoji",
+      "language": "Python",
+      "pushedAt": "2019-10-01T23:58:44Z",
+      "stars": 5
+    },
+    "pablogsal/ghost_unwind": {
+      "description": "Fastest unwinding you have ever seen",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/ghost_unwind",
+      "language": "C++",
+      "pushedAt": "2025-11-28T23:11:52Z",
+      "stars": 3
+    },
+    "pablogsal/gsym-rs": {
+      "description": "Pure-Rust GSYM reader, writer, and Linux ELF/DWARF converter",
+      "forks": 0,
+      "homepage": "https://pablogsal.com/gsym-rs/",
+      "htmlUrl": "https://github.com/pablogsal/gsym-rs",
+      "language": "Rust",
+      "pushedAt": "2026-09-21T05:26:04Z",
+      "stars": 2
+    },
+    "pablogsal/guitar-fretboard-trainer": {
+      "description": null,
+      "forks": 0,
+      "homepage": " http://pablogsal.com/guitar-fretboard-trainer/",
+      "htmlUrl": "https://github.com/pablogsal/guitar-fretboard-trainer",
+      "language": "TypeScript",
+      "pushedAt": "2025-03-04T19:01:25Z",
+      "stars": 1
+    },
+    "pablogsal/heat-equation-GPU": {
+      "description": "A OpenGL/CUDA implementation of a heat equation solver with realtime visualization",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/heat-equation-GPU",
+      "language": "Cuda",
+      "pushedAt": "2023-09-08T00:38:05Z",
+      "stars": 0
+    },
+    "pablogsal/hexforge": {
+      "description": "A patchelf reimplementation that treats ELF patching like a compiler pass",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/hexforge",
+      "language": "Rust",
+      "pushedAt": "2026-03-10T09:35:50Z",
+      "stars": 0
+    },
+    "pablogsal/libbacktrace": {
+      "description": null,
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/libbacktrace",
+      "language": "C",
+      "pushedAt": "2021-01-18T04:39:33Z",
+      "stars": 0
+    },
+    "pablogsal/libunwinder": {
+      "description": null,
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/libunwinder",
+      "language": "Rust",
+      "pushedAt": "2026-07-25T14:22:20Z",
+      "stars": 1
+    },
+    "pablogsal/memory_tracker": {
+      "description": null,
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/memory_tracker",
+      "language": "HTML",
+      "pushedAt": "2025-06-21T22:46:05Z",
+      "stars": 0
+    },
+    "pablogsal/metahell": {
+      "description": "Wellcome to the metahell",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/metahell",
+      "language": "Python",
+      "pushedAt": "2017-08-29T21:26:57Z",
+      "stars": 0
+    },
+    "pablogsal/pablogsal": {
+      "description": null,
+      "forks": 1,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/pablogsal",
+      "language": null,
+      "pushedAt": "2022-06-01T23:13:16Z",
+      "stars": 0
+    },
+    "pablogsal/pablogsal.github.io": {
+      "description": null,
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
+      "language": "Astro",
+      "pushedAt": "2026-09-24T16:44:12Z",
+      "stars": 1
+    },
+    "pablogsal/pensieve-vscode": {
+      "description": null,
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/pensieve-vscode",
+      "language": "TypeScript",
+      "pushedAt": "2021-08-24T10:30:51Z",
+      "stars": 0
+    },
+    "pablogsal/perf_trampoline": {
+      "description": null,
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/perf_trampoline",
+      "language": "C",
+      "pushedAt": "2023-11-27T12:00:12Z",
+      "stars": 0
+    },
+    "pablogsal/pycones2017": {
+      "description": null,
+      "forks": 2,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/pycones2017",
+      "language": "Jupyter Notebook",
+      "pushedAt": "2018-10-17T19:25:02Z",
+      "stars": 8
+    },
+    "pablogsal/pypatchelf": {
+      "description": "[Experimental] Python wrapper for a subset of the patchelf utility",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/pypatchelf",
+      "language": "C",
+      "pushedAt": "2020-09-23T22:39:26Z",
+      "stars": 1
+    },
+    "pablogsal/python-horror-show": {
+      "description": "Strange and odd python snippets explained",
+      "forks": 18,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/python-horror-show",
+      "language": null,
+      "pushedAt": "2022-09-30T07:56:49Z",
+      "stars": 368
+    },
+    "pablogsal/python3.13": {
+      "description": null,
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/python3.13",
+      "language": null,
+      "pushedAt": "2024-10-07T14:44:14Z",
+      "stars": 0
+    },
+    "pablogsal/rtld_fuck": {
+      "description": null,
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/rtld_fuck",
+      "language": "C",
+      "pushedAt": "2024-03-30T16:35:23Z",
+      "stars": 0
+    },
+    "pablogsal/rustracer": {
+      "description": "A simple raytracer made in Rust",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/rustracer",
+      "language": "Rust",
+      "pushedAt": "2021-07-13T23:01:55Z",
+      "stars": 3
+    },
+    "pablogsal/sdfsdf": {
+      "description": "sdfsdfds",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/sdfsdf",
+      "language": "Python",
+      "pushedAt": "2025-04-29T15:07:03Z",
+      "stars": 0
+    },
+    "pablogsal/slowlify": {
+      "description": "Simulate slow, resource-constrained machines to reproduce CI failures and hunt flaky tests",
+      "forks": 1,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/slowlify",
+      "language": "Shell",
+      "pushedAt": "2025-12-06T23:07:13Z",
+      "stars": 25
+    },
+    "pablogsal/speedscope-pyroscope": {
+      "description": "Speedscope with Pyroscope query integration",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/speedscope-pyroscope",
+      "language": "TypeScript",
+      "pushedAt": "2026-08-09T18:48:31Z",
+      "stars": 0
+    },
+    "pablogsal/stackpulse": {
+      "description": "Linux perf_event stack sampling with native unwinding and symbolization",
+      "forks": 0,
+      "homepage": "https://pablogsal.com/stackpulse/",
+      "htmlUrl": "https://github.com/pablogsal/stackpulse",
+      "language": "Rust",
+      "pushedAt": "2026-09-21T11:16:56Z",
+      "stars": 6
+    },
+    "pablogsal/symbol_renamer": {
+      "description": "Rename dynamic symbols from extension modules",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/symbol_renamer",
+      "language": "Python",
+      "pushedAt": "2024-08-25T20:35:27Z",
+      "stars": 1
+    },
+    "pablogsal/thanks-python": {
+      "description": "Thanks Python project",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/thanks-python",
+      "language": "Python",
+      "pushedAt": "2022-12-08T07:43:11Z",
+      "stars": 2
+    },
+    "pablogsal/unrepair": {
+      "description": null,
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/unrepair",
+      "language": "Rust",
+      "pushedAt": "2026-02-19T01:16:12Z",
+      "stars": 0
+    },
+    "pablogsal/weightlifter": {
+      "description": null,
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/weightlifter",
+      "language": "Python",
+      "pushedAt": "2024-10-03T00:08:14Z",
+      "stars": 0
+    },
+    "python/memory.python.org": {
+      "description": "A memory benchmarking and analysis tool for CPython development",
+      "forks": 8,
+      "homepage": "https://memory.python.org",
+      "htmlUrl": "https://github.com/python/memory.python.org",
+      "language": "Python",
+      "pushedAt": "2026-07-08T14:59:02Z",
+      "stars": 19
+    },
+    "we-like-parsers/pegen": {
+      "description": "PEG parser generator for Python",
+      "forks": 44,
+      "homepage": "https://we-like-parsers.github.io/pegen/",
+      "htmlUrl": "https://github.com/we-like-parsers/pegen",
+      "language": "Python",
+      "pushedAt": "2026-09-18T07:54:18Z",
+      "stars": 202
+    }
+  }
+}

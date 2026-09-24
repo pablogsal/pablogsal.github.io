@@ -1,0 +1,76 @@
+name: Discover talks and podcasts
+
+# Searches Apple Podcasts (and YouTube, if the YOUTUBE_API_KEY secret is set)
+# for appearances that the site does not list yet. The results go into one
+# open issue, "New talk/podcast candidates", with the label "discover".
+
+on:
+  schedule:
+    - cron: "41 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: discover
+  cancel-in-progress: false
+
+env:
+  ISSUE_TITLE: New talk/podcast candidates
+  ISSUE_LABEL: discover
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Find the open issue
+        id: issue
+        run: |
+          gh label create "$ISSUE_LABEL" --color 5319e7 \
+            --description "Candidates from the discovery workflow" --force || true
+          number=$(gh issue list --state open --label "$ISSUE_LABEL" --limit 100 \
+            --json number,title \
+            --jq "[.[] | select(.title == env.ISSUE_TITLE)][0].number // empty")
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+          if [ -n "$number" ]; then
+            gh issue view "$number" --json body --jq .body > "$RUNNER_TEMP/previous.md"
+          fi
+
+      - name: Search for candidates
+        id: discover
+        run: node scripts/refresh/discover.mjs --out "$RUNNER_TEMP/report.md" --previous "$RUNNER_TEMP/previous.md"
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+
+      - name: Create or update the issue
+        if: steps.discover.outputs.count != '0'
+        env:
+          NUMBER: ${{ steps.issue.outputs.number }}
+        run: |
+          if [ -n "$NUMBER" ]; then
+            gh issue edit "$NUMBER" --body-file "$RUNNER_TEMP/report.md"
+          else
+            gh issue create --title "$ISSUE_TITLE" --label "$ISSUE_LABEL" \
+              --body-file "$RUNNER_TEMP/report.md"
+          fi
+
+      - name: Close the issue when nothing is left
+        if: steps.discover.outputs.count == '0' && steps.discover.outputs.ok == 'true' && steps.issue.outputs.number != ''
+        env:
+          NUMBER: ${{ steps.issue.outputs.number }}
+        run: |
+          gh issue close "$NUMBER" --comment "The last run found no new candidates. A new issue opens when the workflow finds more."

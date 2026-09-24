@@ -1,0 +1,60 @@
+name: Refresh data snapshots
+
+# Fetches GitHub, CPython, PEP and core.py data into src/data/generated/,
+# commits the changes, and starts a deploy. The site build itself never
+# touches the network.
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Refresh the snapshots
+        run: node scripts/refresh/index.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and push the changes
+        id: commit
+        run: |
+          if [ -z "$(git status --porcelain -- src/data/generated)" ]; then
+            echo "No changes in src/data/generated."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- src/data/generated
+          git commit -m "data: refresh generated snapshots"
+          git pull --rebase
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      # A push made with GITHUB_TOKEN does not start other workflows, so start
+      # the deploy explicitly. Only the default branch deploys.
+      - name: Start the deploy
+        if: steps.commit.outputs.changed == 'true' && github.ref_name == github.event.repository.default_branch
+        run: gh workflow run deploy.yml --ref "$GITHUB_REF_NAME"
+        env:
+          GH_TOKEN: ${{ github.token }}

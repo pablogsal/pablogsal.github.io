@@ -1,3 +1,66 @@
+/* Metric-matched local fallbacks. They hold the layout still while the web
+   fonts load, so the font swap does not move text. size-adjust matches the
+   advance width, measured in Chromium against the self-hosted fonts on the
+   strings this page sets (Silkscreen: the nav and hero buttons, which are
+   on screen at load; Jacquard 24: the hero name, kept a little narrower
+   so it never wraps earlier). The overrides
+   match the ascent and descent. Arial, Times New Roman and Courier New use
+   the values measured on their metric twins (Liberation Sans/Serif/Mono). */
+@font-face {
+  font-family: "JetBrains Mono Fallback";
+  src: local("Menlo"), local("DejaVu Sans Mono");
+  size-adjust: 99.66%;
+  ascent-override: 102.35%;
+  descent-override: 30.1%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "JetBrains Mono Fallback Alt";
+  src: local("Courier New"), local("Liberation Mono");
+  size-adjust: 99.98%;
+  ascent-override: 102.02%;
+  descent-override: 30.01%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Silkscreen Fallback";
+  src: local("Arial"), local("Liberation Sans");
+  /* only what Silkscreen itself covers, so arrows, squares and stars skip
+     this face and come from JetBrains Mono (see --f-pixel) */
+  unicode-range: U+20-7E, U+A0-FF, U+152-153, U+160-161, U+178, U+17D-17E, U+192, U+2013-2014, U+2018-201A, U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+20AC, U+2122;
+  size-adjust: 110%;
+  ascent-override: 93.64%;
+  descent-override: 22.73%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Silkscreen Fallback Alt";
+  src: local("DejaVu Sans");
+  /* only what Silkscreen itself covers, so arrows, squares and stars skip
+     this face and come from JetBrains Mono (see --f-pixel) */
+  unicode-range: U+20-7E, U+A0-FF, U+152-153, U+160-161, U+178, U+17D-17E, U+192, U+2013-2014, U+2018-201A, U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+20AC, U+2122;
+  size-adjust: 110%;
+  ascent-override: 93.64%;
+  descent-override: 22.73%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Jacquard 24 Fallback";
+  src: local("Times New Roman"), local("Liberation Serif");
+  size-adjust: 84.5%;
+  ascent-override: 93.49%;
+  descent-override: 24.85%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Jacquard 24 Fallback Alt";
+  src: local("DejaVu Serif");
+  size-adjust: 68%;
+  ascent-override: 116.18%;
+  descent-override: 30.88%;
+  line-gap-override: 0%;
+}
+
 :root {
   --ink: #0a0908;
   --ink-2: #121110;
@@ -11,9 +74,19 @@
   --ember-dim: #7a2a1f;
   --gold: #c9a86a;
 
-  --f-display: "Grenze Gotisch", "UnifrakturCook", Georgia, serif;
-  --f-serif: "EB Garamond", "Iowan Old Style", Georgia, serif;
-  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --f-display: "Jacquard 24", "Jacquard 24 Fallback", "Jacquard 24 Fallback Alt", Georgia, serif;
+  /* Silkscreen has no arrows, squares or stars: those come from JetBrains
+     Mono. Its fallbacks are limited to Silkscreen's range, so letters never
+     render in JetBrains Mono while Silkscreen loads. */
+  --f-pixel: "Silkscreen", "Silkscreen Fallback", "Silkscreen Fallback Alt", "JetBrains Mono", "JetBrains Mono Fallback", "JetBrains Mono Fallback Alt", ui-monospace, monospace;
+  --f-mono: "JetBrains Mono", "JetBrains Mono Fallback", "JetBrains Mono Fallback Alt", ui-monospace, monospace;
+  --f-body: var(--f-mono);
+  /* legacy alias: body text is mono now */
+  --f-serif: var(--f-body);
+
+  /* 4x4 ordered-dither tiles (bone on transparent), for pixel fills */
+  --dither-25: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23ece6da' d='M0 0h1v1H0zM2 2h1v1H2z'/%3E%3C/svg%3E");
+  --dither-50: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2' shape-rendering='crispEdges'%3E%3Cpath fill='%23ece6da' d='M0 0h1v1H0zM1 1h1v1H1z'/%3E%3C/svg%3E");
 
   --step--2: clamp(0.69rem, 0.67rem + 0.1vw, 0.75rem);
   --step--1: clamp(0.8rem, 0.77rem + 0.15vw, 0.9rem);
@@ -47,14 +120,12 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scroll-behavior: smooth;
+  /* no smooth scrolling: it animated every anchor load and nav jump across
+     the whole page, and it made the page feel like it was moving on its own */
   scroll-padding-top: 4.5rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
   *,
   *::before,
   *::after {
@@ -68,10 +139,9 @@ body {
   margin: 0;
   background: var(--ink);
   color: var(--bone);
-  font-family: var(--f-serif);
-  font-size: var(--step-0);
-  line-height: 1.55;
-  font-feature-settings: "onum", "liga", "kern";
+  font-family: var(--f-body);
+  font-size: calc(var(--step-0) * 0.86);
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -141,9 +211,9 @@ samp {
 }
 
 .label {
-  font-family: var(--f-mono);
+  font-family: var(--f-pixel);
   font-size: var(--step--2);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--dust);
 }
@@ -154,16 +224,11 @@ samp {
 
 .display {
   font-family: var(--f-display);
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 .ember {
-  color: var(--ember);
-}
-
-.prompt::before {
-  content: ">>> ";
   color: var(--ember);
 }
 
@@ -216,54 +281,86 @@ samp {
   background: var(--line);
 }
 
-/* scroll reveal, activated by the layout script */
-.reveal {
+/* scroll reveal, activated by the layout script. Opacity only: it never
+   moves or resizes anything. Hidden only once the script has run (html.js),
+   never without JS, and the script marks what is already on screen first. */
+.js .reveal:not(.is-in) {
   opacity: 0;
-  transform: translateY(14px);
-  transition: opacity 0.9s ease, transform 0.9s ease;
 }
 
-.reveal.is-in {
-  opacity: 1;
-  transform: none;
+.reveal {
+  transition: opacity 0.4s steps(4);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
+  .js .reveal:not(.is-in) {
     opacity: 1;
-    transform: none;
   }
 }
 
-/* shared button-ish link */
+/* pixel buttons: 2px border, hard offset shadow, stepped press */
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 0.6em;
-  padding: 0.7em 1.1em;
-  border: 1px solid var(--line-2);
-  font-family: var(--f-mono);
+  padding: 0.75em 1.1em;
+  border: 2px solid var(--bone);
+  font-family: var(--f-pixel);
   font-size: var(--step--1);
-  letter-spacing: 0.04em;
+  text-transform: uppercase;
   text-decoration: none;
   color: var(--bone);
-  background: transparent;
-  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  background: var(--ink);
+  box-shadow: 4px 4px 0 var(--ink-3);
+  transition: none;
 }
 
 .btn:hover {
+  color: var(--ink);
+  background: var(--ember);
   border-color: var(--ember);
-  color: var(--ember);
+  box-shadow: 4px 4px 0 var(--ember-dim);
+}
+
+.btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
 }
 
 .btn--solid {
   background: var(--bone);
   color: var(--ink);
-  border-color: var(--bone);
 }
 
-.btn--solid:hover {
-  background: var(--ember);
-  border-color: var(--ember);
-  color: var(--ink);
+/* pixel utilities */
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.dither {
+  background-image: var(--dither-25);
+  background-size: 4px 4px;
+  image-rendering: pixelated;
+}
+
+.dither-50 {
+  background-image: var(--dither-50);
+  background-size: 2px 2px;
+  image-rendering: pixelated;
+}
+
+.px-box {
+  border: 2px solid var(--line-2);
+  background: var(--ink);
+}
+
+.blink {
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
 }
