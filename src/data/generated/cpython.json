@@ -1,7 +1,7 @@
 {
-  "commits": 958,
+  "commits": 962,
   "contributorRank": 29,
-  "fetchedAt": "2026-09-24T16:47:23.377Z",
+  "fetchedAt": "2026-09-25T10:11:27.279Z",
   "firstMergedPR": {
     "createdAt": "2017-08-28T18:43:54Z",
     "mergedAt": "2017-09-07T20:53:13Z",
@@ -9,7 +9,7 @@
     "title": "bpo-31294: Fix ZeroMQSocketListener and ZeroMQSocketHandler examples",
     "url": "https://github.com/python/cpython/pull/3229"
   },
-  "mergedPRs": 1121,
+  "mergedPRs": 1126,
   "mergedPRsByYear": [
     {
       "count": 14,
@@ -48,7 +48,7 @@
       "year": "2025"
     },
     {
-      "count": 89,
+      "count": 94,
       "year": "2026"
     }
   ]
