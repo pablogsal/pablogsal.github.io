@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-25T10:11:05.443Z",
+  "fetchedAt": "2026-09-26T09:51:39.778Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
     "followers": 1203,
@@ -257,8 +257,8 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "Astro",
-      "pushedAt": "2026-09-24T18:15:46Z",
-      "stars": 1
+      "pushedAt": "2026-09-25T10:11:30Z",
+      "stars": 2
     },
     "pablogsal/pensieve-vscode": {
       "description": null,
