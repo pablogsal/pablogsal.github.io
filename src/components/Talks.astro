@@ -110,6 +110,7 @@ function extraLinks(t: Talk) {
   if (t.url) out.push({ label: "Event", href: t.url });
   if (t.writeupUrl) out.push({ label: "Write-up", href: t.writeupUrl });
   if (t.slidesUrl) out.push({ label: "Slides", href: t.slidesUrl });
+  if (t.audioUrl) out.push({ label: "Audio", href: t.audioUrl });
   return out;
 }
 

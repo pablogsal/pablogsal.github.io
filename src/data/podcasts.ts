@@ -98,9 +98,9 @@ export const appearances: Appearance[] = [
   },
   {
     show: "behindthecommit",
-    title: "Behind the Python Release: Motivation, Fails & Rituals",
+    title: "Behind the Python Release: Motivation, Fails & Rituals with Łukasz, Pablo & Hugo",
     date: "2025-10-14",
-    url: "https://podcasts.apple.com/us/podcast/behind-the-python-release-motivation-fails-rituals/id1845604486",
+    url: "https://podcasts.apple.com/us/podcast/behind-the-python-release-motivation-fails-rituals/id1845604486?i=1000731819697",
     youtube: "BHUWyM2cxwE",
     lang: "en",
     kind: "audio",
@@ -129,6 +129,16 @@ export const appearances: Appearance[] = [
     title: "Free-threaded Python",
     date: "2024-10-02",
     url: "https://changelog.com/podcast/611",
+    alt: [
+      {
+        label: "Apple Podcasts (Master Feed)",
+        href: "https://podcasts.apple.com/us/podcast/free-threaded-python-changelog-interviews-611/id1164554936?i=1000671589448",
+      },
+      {
+        label: "Apple Podcasts (The Changelog)",
+        href: "https://podcasts.apple.com/us/podcast/free-threaded-python-interview/id341623264?i=1000671589477",
+      },
+    ],
     lang: "en",
     kind: "audio",
     host: "Jerod Santo",
@@ -325,7 +335,7 @@ export const appearances: Appearance[] = [
     alt: [
       {
         label: "Apple Podcasts",
-        href: "https://podcasts.apple.com/dk/podcast/trabajar-en-el-core-de-python-con-pablo/id1124975855?i=1000537305590",
+        href: "https://podcasts.apple.com/us/podcast/trabajar-en-el-core-de-python-con-pablo/id1124975855?i=1000777263821",
       },
     ],
     lang: "es",

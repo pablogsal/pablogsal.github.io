@@ -44,6 +44,8 @@ export interface Talk {
   /** Event or schedule page. */
   url?: string;
   slidesUrl?: string;
+  /** Audio version of a talk, when the event also published it as a podcast. */
+  audioUrl?: string;
   /** PSF blog write-up (Language Summit sessions are not recorded). */
   writeupUrl?: string;
   coSpeakers?: string[];
@@ -782,6 +784,7 @@ export const talks: Talk[] = [
     language: "es",
     kind: "talk",
     youtubeId: "vOGacccUsog",
+    audioUrl: "https://podcasts.apple.com/us/podcast/oh-vosotros-los-que-entr%C3%A1is-abandonad-toda-esperanza/id1478633999?i=1000460235076",
     abstract:
       "How Python works on the inside, from the source code to its execution in the interpreter.",
   },
