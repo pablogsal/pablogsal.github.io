@@ -1,8 +1,8 @@
 {
-  "fetchedAt": "2026-09-29T11:21:34.669Z",
+  "fetchedAt": "2026-09-30T11:09:43.182Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
-    "followers": 1203,
+    "followers": 1205,
     "htmlUrl": "https://github.com/pablogsal",
     "login": "pablogsal",
     "publicRepos": 100
@@ -24,7 +24,7 @@
       "htmlUrl": "https://github.com/bloomberg/pystack",
       "language": "C++",
       "pushedAt": "2026-09-28T16:54:03Z",
-      "stars": 1218
+      "stars": 1219
     },
     "bloomberg/pytest-memray": {
       "description": "pytest plugin for easy integration of memray memory profiler",
@@ -33,7 +33,7 @@
       "htmlUrl": "https://github.com/bloomberg/pytest-memray",
       "language": "Python",
       "pushedAt": "2026-09-21T17:22:00Z",
-      "stars": 424
+      "stars": 425
     },
     "pablogsal/IPcam_tracker": {
       "description": "A motion detector tracker based on OpenCV for my IP camera.",
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-09-28T20:18:50Z",
+      "pushedAt": "2026-09-29T11:22:01Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
@@ -365,7 +365,7 @@
       "homepage": "https://pablogsal.com/stackpulse/",
       "htmlUrl": "https://github.com/pablogsal/stackpulse",
       "language": "Rust",
-      "pushedAt": "2026-09-29T02:11:53Z",
+      "pushedAt": "2026-09-29T13:11:38Z",
       "stars": 6
     },
     "pablogsal/symbol_renamer": {
