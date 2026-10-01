@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-30T11:09:43.182Z",
+  "fetchedAt": "2026-10-01T11:36:45.354Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
     "followers": 1205,
@@ -15,7 +15,7 @@
       "htmlUrl": "https://github.com/bloomberg/memray",
       "language": "Python",
       "pushedAt": "2026-09-28T00:23:08Z",
-      "stars": 15243
+      "stars": 15246
     },
     "bloomberg/pystack": {
       "description": "🔍 🐍 Like pstack but for Python!",
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-09-29T11:22:01Z",
+      "pushedAt": "2026-09-30T11:10:08Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
