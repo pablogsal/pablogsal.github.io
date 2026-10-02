@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-24T16:46:37.128Z",
+  "fetchedAt": "2026-10-02T11:06:16.417Z",
   "peps": [
     {
       "authors": [
@@ -37,7 +37,7 @@
       "created": "2020-05-25",
       "number": 619,
       "python_version": "3.10",
-      "status": "Active",
+      "status": "Final",
       "title": "Python 3.10 Release Schedule",
       "type": "Informational",
       "url": "https://peps.python.org/pep-0619/"
