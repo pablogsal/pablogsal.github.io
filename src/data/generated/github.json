@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-05T12:15:46.868Z",
+  "fetchedAt": "2026-10-06T12:01:05.555Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
     "followers": 1206,
@@ -14,8 +14,8 @@
       "homepage": "https://bloomberg.github.io/memray/",
       "htmlUrl": "https://github.com/bloomberg/memray",
       "language": "Python",
-      "pushedAt": "2026-10-03T21:08:24Z",
-      "stars": 15312
+      "pushedAt": "2026-10-06T00:17:38Z",
+      "stars": 15340
     },
     "bloomberg/pystack": {
       "description": "🔍 🐍 Like pstack but for Python!",
@@ -24,11 +24,11 @@
       "htmlUrl": "https://github.com/bloomberg/pystack",
       "language": "C++",
       "pushedAt": "2026-09-28T16:54:03Z",
-      "stars": 1222
+      "stars": 1224
     },
     "bloomberg/pytest-memray": {
       "description": "pytest plugin for easy integration of memray memory profiler",
-      "forks": 40,
+      "forks": 39,
       "homepage": "https://pytest-memray.readthedocs.io/en/latest/",
       "htmlUrl": "https://github.com/bloomberg/pytest-memray",
       "language": "Python",
@@ -168,7 +168,7 @@
       "htmlUrl": "https://github.com/pablogsal/ghost_unwind",
       "language": "C++",
       "pushedAt": "2025-11-28T23:11:52Z",
-      "stars": 3
+      "stars": 4
     },
     "pablogsal/gsym-rs": {
       "description": "Pure-Rust GSYM reader, writer, and Linux ELF/DWARF converter",
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-10-04T11:06:32Z",
+      "pushedAt": "2026-10-05T12:16:12Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
