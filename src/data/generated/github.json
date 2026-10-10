@@ -1,8 +1,8 @@
 {
-  "fetchedAt": "2026-10-09T11:53:20.154Z",
+  "fetchedAt": "2026-10-10T11:10:07.253Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
-    "followers": 1206,
+    "followers": 1207,
     "htmlUrl": "https://github.com/pablogsal",
     "login": "pablogsal",
     "publicRepos": 102
@@ -10,12 +10,12 @@
   "repos": {
     "bloomberg/memray": {
       "description": "Memray is a memory profiler for Python",
-      "forks": 478,
+      "forks": 479,
       "homepage": "https://bloomberg.github.io/memray/",
       "htmlUrl": "https://github.com/bloomberg/memray",
       "language": "Python",
       "pushedAt": "2026-10-07T15:29:49Z",
-      "stars": 15368
+      "stars": 15372
     },
     "bloomberg/pystack": {
       "description": "🔍 🐍 Like pstack but for Python!",
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-10-08T12:01:37Z",
+      "pushedAt": "2026-10-09T11:53:44Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
