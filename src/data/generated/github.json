@@ -1,8 +1,8 @@
 {
-  "fetchedAt": "2026-10-18T09:35:53.556Z",
+  "fetchedAt": "2026-10-19T10:44:32.830Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
-    "followers": 1210,
+    "followers": 1211,
     "htmlUrl": "https://github.com/pablogsal",
     "login": "pablogsal",
     "publicRepos": 102
@@ -14,8 +14,8 @@
       "homepage": "https://bloomberg.github.io/memray/",
       "htmlUrl": "https://github.com/bloomberg/memray",
       "language": "Python",
-      "pushedAt": "2026-10-17T20:49:45Z",
-      "stars": 15384
+      "pushedAt": "2026-10-19T00:27:28Z",
+      "stars": 15385
     },
     "bloomberg/pystack": {
       "description": "🔍 🐍 Like pstack but for Python!",
@@ -176,7 +176,7 @@
       "homepage": "https://pablogsal.com/gsym-rs/",
       "htmlUrl": "https://github.com/pablogsal/gsym-rs",
       "language": "Rust",
-      "pushedAt": "2026-10-12T16:38:10Z",
+      "pushedAt": "2026-10-19T05:27:22Z",
       "stars": 2
     },
     "pablogsal/guitar-fretboard-trainer": {
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-10-17T09:19:50Z",
+      "pushedAt": "2026-10-18T09:36:18Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
@@ -365,7 +365,7 @@
       "homepage": "https://pablogsal.com/stackpulse/",
       "htmlUrl": "https://github.com/pablogsal/stackpulse",
       "language": "Rust",
-      "pushedAt": "2026-10-13T08:08:39Z",
+      "pushedAt": "2026-10-19T07:31:14Z",
       "stars": 6
     },
     "pablogsal/symbol_renamer": {
