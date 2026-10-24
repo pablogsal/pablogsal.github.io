@@ -1,8 +1,8 @@
 {
-  "fetchedAt": "2026-10-23T10:02:12.125Z",
+  "fetchedAt": "2026-10-24T09:31:10.200Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
-    "followers": 1212,
+    "followers": 1213,
     "htmlUrl": "https://github.com/pablogsal",
     "login": "pablogsal",
     "publicRepos": 102
@@ -15,7 +15,7 @@
       "htmlUrl": "https://github.com/bloomberg/memray",
       "language": "Python",
       "pushedAt": "2026-10-22T00:22:31Z",
-      "stars": 15396
+      "stars": 15395
     },
     "bloomberg/pystack": {
       "description": "🔍 🐍 Like pstack but for Python!",
@@ -24,11 +24,11 @@
       "htmlUrl": "https://github.com/bloomberg/pystack",
       "language": "C++",
       "pushedAt": "2026-10-14T21:14:44Z",
-      "stars": 1224
+      "stars": 1225
     },
     "bloomberg/pytest-memray": {
       "description": "pytest plugin for easy integration of memray memory profiler",
-      "forks": 39,
+      "forks": 40,
       "homepage": "https://pytest-memray.readthedocs.io/en/latest/",
       "htmlUrl": "https://github.com/bloomberg/pytest-memray",
       "language": "Python",
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-10-22T10:09:51Z",
+      "pushedAt": "2026-10-23T10:02:37Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
