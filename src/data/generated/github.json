@@ -1,8 +1,8 @@
 {
-  "fetchedAt": "2026-10-25T09:47:47.837Z",
+  "fetchedAt": "2026-10-26T11:05:13.946Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
-    "followers": 1211,
+    "followers": 1213,
     "htmlUrl": "https://github.com/pablogsal",
     "login": "pablogsal",
     "publicRepos": 102
@@ -176,7 +176,7 @@
       "homepage": "https://pablogsal.com/gsym-rs/",
       "htmlUrl": "https://github.com/pablogsal/gsym-rs",
       "language": "Rust",
-      "pushedAt": "2026-10-19T05:27:22Z",
+      "pushedAt": "2026-10-26T05:54:51Z",
       "stars": 2
     },
     "pablogsal/guitar-fretboard-trainer": {
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-10-24T09:31:34Z",
+      "pushedAt": "2026-10-25T09:48:14Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
