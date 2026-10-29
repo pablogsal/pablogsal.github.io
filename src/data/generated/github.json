@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-28T11:19:37.182Z",
+  "fetchedAt": "2026-10-29T11:29:52.397Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
     "followers": 1212,
@@ -14,8 +14,8 @@
       "homepage": "https://bloomberg.github.io/memray/",
       "htmlUrl": "https://github.com/bloomberg/memray",
       "language": "Python",
-      "pushedAt": "2026-10-28T00:23:17Z",
-      "stars": 15398
+      "pushedAt": "2026-10-29T00:23:06Z",
+      "stars": 15400
     },
     "bloomberg/pystack": {
       "description": "🔍 🐍 Like pstack but for Python!",
@@ -32,7 +32,7 @@
       "homepage": "https://pytest-memray.readthedocs.io/en/latest/",
       "htmlUrl": "https://github.com/bloomberg/pytest-memray",
       "language": "Python",
-      "pushedAt": "2026-10-27T22:12:36Z",
+      "pushedAt": "2026-10-28T22:12:35Z",
       "stars": 427
     },
     "pablogsal/IPcam_tracker": {
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-10-27T10:31:52Z",
+      "pushedAt": "2026-10-28T11:20:02Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
@@ -303,7 +303,7 @@
       "htmlUrl": "https://github.com/pablogsal/python-horror-show",
       "language": null,
       "pushedAt": "2022-09-30T07:56:49Z",
-      "stars": 369
+      "stars": 370
     },
     "pablogsal/python3.13": {
       "description": null,
