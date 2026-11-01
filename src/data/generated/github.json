@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-31T10:54:37.381Z",
+  "fetchedAt": "2026-11-01T11:49:35.207Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
     "followers": 1212,
@@ -24,7 +24,7 @@
       "htmlUrl": "https://github.com/bloomberg/pystack",
       "language": "C++",
       "pushedAt": "2026-10-14T21:14:44Z",
-      "stars": 1226
+      "stars": 1227
     },
     "bloomberg/pytest-memray": {
       "description": "pytest plugin for easy integration of memray memory profiler",
@@ -176,7 +176,7 @@
       "homepage": "https://pablogsal.com/gsym-rs/",
       "htmlUrl": "https://github.com/pablogsal/gsym-rs",
       "language": "Rust",
-      "pushedAt": "2026-10-26T05:54:51Z",
+      "pushedAt": "2026-11-01T05:25:26Z",
       "stars": 2
     },
     "pablogsal/guitar-fretboard-trainer": {
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-10-30T11:23:28Z",
+      "pushedAt": "2026-10-31T10:55:03Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
