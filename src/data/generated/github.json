@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-02T13:28:26.378Z",
+  "fetchedAt": "2026-11-03T12:46:52.582Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
     "followers": 1212,
@@ -14,7 +14,7 @@
       "homepage": "https://bloomberg.github.io/memray/",
       "htmlUrl": "https://github.com/bloomberg/memray",
       "language": "Python",
-      "pushedAt": "2026-10-30T23:43:25Z",
+      "pushedAt": "2026-11-03T00:23:13Z",
       "stars": 15404
     },
     "bloomberg/pystack": {
@@ -172,7 +172,7 @@
     },
     "pablogsal/gsym-rs": {
       "description": "Pure-Rust GSYM reader, writer, and Linux ELF/DWARF converter",
-      "forks": 0,
+      "forks": 1,
       "homepage": "https://pablogsal.com/gsym-rs/",
       "htmlUrl": "https://github.com/pablogsal/gsym-rs",
       "language": "Rust",
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-11-01T11:49:58Z",
+      "pushedAt": "2026-11-02T13:28:51Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
