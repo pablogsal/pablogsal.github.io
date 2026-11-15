@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-14T12:09:41.407Z",
+  "fetchedAt": "2026-11-15T12:42:52.540Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
     "followers": 1212,
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-11-13T13:07:15Z",
+      "pushedAt": "2026-11-14T12:10:04Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
@@ -420,7 +420,7 @@
       "htmlUrl": "https://github.com/we-like-parsers/pegen",
       "language": "Python",
       "pushedAt": "2026-11-09T12:31:02Z",
-      "stars": 205
+      "stars": 206
     }
   }
 }
