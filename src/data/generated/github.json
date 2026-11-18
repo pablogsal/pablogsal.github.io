@@ -1,11 +1,11 @@
 {
-  "fetchedAt": "2026-11-17T14:21:42.953Z",
+  "fetchedAt": "2026-11-18T13:56:00.877Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
-    "followers": 1212,
+    "followers": 1211,
     "htmlUrl": "https://github.com/pablogsal",
     "login": "pablogsal",
-    "publicRepos": 102
+    "publicRepos": 103
   },
   "repos": {
     "bloomberg/memray": {
@@ -14,17 +14,17 @@
       "homepage": "https://bloomberg.github.io/memray/",
       "htmlUrl": "https://github.com/bloomberg/memray",
       "language": "Python",
-      "pushedAt": "2026-11-16T21:20:45Z",
-      "stars": 15418
+      "pushedAt": "2026-11-18T12:51:30Z",
+      "stars": 15420
     },
     "bloomberg/pystack": {
       "description": "🔍 🐍 Like pstack but for Python!",
-      "forks": 74,
+      "forks": 75,
       "homepage": "https://bloomberg.github.io/pystack",
       "htmlUrl": "https://github.com/bloomberg/pystack",
       "language": "C++",
       "pushedAt": "2026-10-14T21:14:44Z",
-      "stars": 1227
+      "stars": 1226
     },
     "bloomberg/pytest-memray": {
       "description": "pytest plugin for easy integration of memray memory profiler",
@@ -32,7 +32,7 @@
       "homepage": "https://pytest-memray.readthedocs.io/en/latest/",
       "htmlUrl": "https://github.com/bloomberg/pytest-memray",
       "language": "Python",
-      "pushedAt": "2026-11-09T22:12:27Z",
+      "pushedAt": "2026-11-17T22:34:48Z",
       "stars": 428
     },
     "pablogsal/IPcam_tracker": {
@@ -176,7 +176,7 @@
       "homepage": "https://pablogsal.com/gsym-rs/",
       "htmlUrl": "https://github.com/pablogsal/gsym-rs",
       "language": "Rust",
-      "pushedAt": "2026-11-01T05:25:26Z",
+      "pushedAt": "2026-11-18T13:05:54Z",
       "stars": 2
     },
     "pablogsal/guitar-fretboard-trainer": {
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-11-16T13:37:44Z",
+      "pushedAt": "2026-11-17T14:22:07Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
@@ -402,6 +402,15 @@
       "htmlUrl": "https://github.com/pablogsal/weightlifter",
       "language": "Python",
       "pushedAt": "2024-10-03T00:08:14Z",
+      "stars": 0
+    },
+    "pablogsal/wholesym": {
+      "description": "Packaging-only fork of mstange/samply for wholesym-stackpulse and related symbol libraries. Upstream Rust source and APIs are preserved.",
+      "forks": 0,
+      "homepage": null,
+      "htmlUrl": "https://github.com/pablogsal/wholesym",
+      "language": "Rust",
+      "pushedAt": "2026-11-17T14:41:58Z",
       "stars": 0
     },
     "python/memory.python.org": {
