@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-19T14:24:11.801Z",
+  "fetchedAt": "2026-11-20T13:59:23.803Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
     "followers": 1210,
@@ -15,7 +15,7 @@
       "htmlUrl": "https://github.com/bloomberg/memray",
       "language": "Python",
       "pushedAt": "2026-11-18T16:52:01Z",
-      "stars": 15421
+      "stars": 15420
     },
     "bloomberg/pystack": {
       "description": "🔍 🐍 Like pstack but for Python!",
@@ -24,7 +24,7 @@
       "htmlUrl": "https://github.com/bloomberg/pystack",
       "language": "C++",
       "pushedAt": "2026-10-14T21:14:44Z",
-      "stars": 1227
+      "stars": 1226
     },
     "bloomberg/pytest-memray": {
       "description": "pytest plugin for easy integration of memray memory profiler",
@@ -33,7 +33,7 @@
       "htmlUrl": "https://github.com/bloomberg/pytest-memray",
       "language": "Python",
       "pushedAt": "2026-11-17T22:34:48Z",
-      "stars": 428
+      "stars": 427
     },
     "pablogsal/IPcam_tracker": {
       "description": "A motion detector tracker based on OpenCV for my IP camera.",
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-11-18T13:56:25Z",
+      "pushedAt": "2026-11-19T14:24:35Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
@@ -303,7 +303,7 @@
       "htmlUrl": "https://github.com/pablogsal/python-horror-show",
       "language": null,
       "pushedAt": "2022-09-30T07:56:49Z",
-      "stars": 371
+      "stars": 370
     },
     "pablogsal/python3.13": {
       "description": null,
