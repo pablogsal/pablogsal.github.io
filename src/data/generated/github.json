@@ -1,8 +1,8 @@
 {
-  "fetchedAt": "2026-11-25T15:34:41.979Z",
+  "fetchedAt": "2026-11-26T15:11:26.529Z",
   "profile": {
     "bio": "@python steering council, core developer, and @psf fellow. I hate symbols but I love linkers.",
-    "followers": 1210,
+    "followers": 1211,
     "htmlUrl": "https://github.com/pablogsal",
     "login": "pablogsal",
     "publicRepos": 103
@@ -14,8 +14,8 @@
       "homepage": "https://bloomberg.github.io/memray/",
       "htmlUrl": "https://github.com/bloomberg/memray",
       "language": "Python",
-      "pushedAt": "2026-11-24T22:18:02Z",
-      "stars": 15423
+      "pushedAt": "2026-11-26T14:55:47Z",
+      "stars": 15425
     },
     "bloomberg/pystack": {
       "description": "🔍 🐍 Like pstack but for Python!",
@@ -24,7 +24,7 @@
       "htmlUrl": "https://github.com/bloomberg/pystack",
       "language": "C++",
       "pushedAt": "2026-10-14T21:14:44Z",
-      "stars": 1230
+      "stars": 1231
     },
     "bloomberg/pytest-memray": {
       "description": "pytest plugin for easy integration of memray memory profiler",
@@ -257,7 +257,7 @@
       "homepage": null,
       "htmlUrl": "https://github.com/pablogsal/pablogsal.github.io",
       "language": "TypeScript",
-      "pushedAt": "2026-11-24T15:51:51Z",
+      "pushedAt": "2026-11-25T15:35:05Z",
       "stars": 2
     },
     "pablogsal/pensieve-vscode": {
@@ -415,7 +415,7 @@
     },
     "python/memory.python.org": {
       "description": "A memory benchmarking and analysis tool for CPython development",
-      "forks": 9,
+      "forks": 10,
       "homepage": "https://memory.python.org",
       "htmlUrl": "https://github.com/python/memory.python.org",
       "language": "Python",
